@@ -1,0 +1,23 @@
+{
+  "name": "sds_fullstack",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/jamizan/SDS_FullStack#readme",
+  "bugs": {
+    "url": "https://github.com/jamizan/SDS_FullStack/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamizan/SDS_FullStack.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon --env-file=../.env server2.js"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
