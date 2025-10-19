@@ -1,0 +1,25 @@
+{
+  "name": "sds_fullstack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamizan/SDS_FullStack.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jamizan/SDS_FullStack/issues"
+  },
+  "homepage": "https://github.com/jamizan/SDS_FullStack#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "mongodb": "^6.20.0"
+  }
+}
