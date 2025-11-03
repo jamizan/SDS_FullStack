@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node express_crash/server.js",
-    "dev": "node --watch express_crash/server.js",
+    "dev": "node --watch --env-file=.env express_crash/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -15,12 +15,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/jamizan/SDS_FullStack/issues"
   },
   "homepage": "https://github.com/jamizan/SDS_FullStack#readme",
   "dependencies": {
+    "colors": "^1.4.0",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mongodb": "^6.20.0"
