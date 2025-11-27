@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import RecipeModal from './RecipeModal.jsx';
 
-function RecipeTable({ recipes, showActions = true, columns = ['title', 'description', 'time'], onUpdate }) {
+function RecipeTable({ recipes, showActions = true, columns = ['title', 'description', 'time'], onUpdate, onCreate, onDelete }) {
   const [expandedId, setExpandedId] = useState(null);
   const [editingRecipe, setEditingRecipe] = useState(null);
 
@@ -18,12 +18,35 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
   };
 
   const handleSave = (updatedData) => {
-    onUpdate(editingRecipe._id, updatedData);
+    if (editingRecipe._id) {
+      onUpdate(editingRecipe._id, updatedData);
+    } else {
+      onCreate(updatedData);
+    }
     setEditingRecipe(null);
+  };
+
+  const handleAddNew = () => {
+    setEditingRecipe({
+      title: '',
+      description: '',
+      ingredients: [],
+      instructions: '',
+      prepTime: 0,
+    });
   };
 
   return (
     <>
+    <div className='add-new-button-container'>
+      <button 
+        className='add-new-button' 
+        onClick={handleAddNew}
+        onClose={handleCloseModal}
+      >
+        Add New Recipe
+      </button>
+    </div>
     <table className="recipe-table">
       <thead>
         <tr>
@@ -49,7 +72,7 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
                 <td onClick={(e) => e.stopPropagation()}>
                     <button onClick={() => handleEdit(recipe)}>Edit</button>
                     <button>Add to List</button>
-                    <button id="delete-button">Delete</button>
+                    <button id="delete-button" onClick={() => onDelete(recipe._id)}>Delete</button>
                 </td>
               )}
             </tr>

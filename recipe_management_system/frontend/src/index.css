@@ -142,6 +142,23 @@ body {
 #delete-button:hover{
   background: #e74c3c !important;
 }
+.add-new-button {
+  background: var(--success);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-bottom: 5px;
+  transition: background 0.3s;
+}
+.add-new-button-container {
+  width: 80%;
+  margin: 20px auto 0;
+  display: flex;
+  justify-content: flex-start;
+}
 
 /* Modal Styles */
 .modal-overlay {
@@ -188,7 +205,9 @@ body {
   padding: 0;
   width: 30px;
   height: 30px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .close-btn:hover {
@@ -263,7 +282,9 @@ body {
   border-radius: 50%;
   cursor: pointer;
   font-size: 16px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-actions {
@@ -273,8 +294,7 @@ body {
   margin-top: 20px;
 }
 
-.btn-cancel,
-.btn-save {
+.btn-cancel, .btn-save {
   padding: 10px 20px;
   border: none;
   border-radius: 4px;
