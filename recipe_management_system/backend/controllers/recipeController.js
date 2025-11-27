@@ -45,11 +45,13 @@ const createRecipe = asyncHandler(async (req, res) => {
         throw new Error('Please add all required fields: title, ingredients, instructions');
     }
 
-    const { title, ingredients, instructions } = requestBody;
+    const { title, description, ingredients, instructions, prepTime } = requestBody;
     const recipe = await Recipe.create({
         title,
+        description,
         ingredients,
         instructions,
+        prepTime,
         user: req.user.id,
     });
     res.status(201).json(recipe);

@@ -6,6 +6,10 @@ const recipeSchema = mongoose.Schema(
             type: String,
             required: [true, 'Please add a title'],
         },
+        description: {
+            type: String,
+            required: [true, 'Please add a description'],
+        },
         ingredients: {
             type: [String],
             required: [true, 'Please add ingredients'],
@@ -13,6 +17,10 @@ const recipeSchema = mongoose.Schema(
         instructions: {
             type: String,
             required: [true, 'Please add instructions'],
+        },
+        prepTime: {
+            type: Number,
+            required: [true, 'Please add preparation time in minutes'],
         },
         user: {
             type: mongoose.Schema.Types.ObjectId,

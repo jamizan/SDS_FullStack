@@ -9,6 +9,7 @@
   --white: #ffffff;
   --text-dark: #2c3e50;
   --text-light: #7f8c8d;
+  --hover: #dfe6e9;
 }
 
 body {
@@ -93,7 +94,208 @@ body {
 /* Recipes styles */
 .recipes-container table{
   padding: 20px;
-  align-items: center;
-  justify-content: center;
+  width: 80%;
+  margin: auto;
+  border-collapse: collapse;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  table-layout: fixed;
+}
+.recipe-table tr:hover {
+  background-color: var(--hover) !important;
+}
+.recipe-table tr.recipe-details:hover {
+  background-color: transparent !important;
+}
+.recipes-container tr:nth-child(even) {
+  background-color: var(--light);
+}
+.recipes-container tr:nth-child(odd) {
+  background-color: var(--white);
+}
+.recipes-container th, .recipes-container td {
+  padding: 12px 15px;
+  text-align: left;
+  word-wrap: break-word;
+}
+.recipes-container th {
+  background-color: var(--primary);
+  color: var(--white);
+}
+.recipes-container button {
+  background: var(--accent);
+  color: var(--white);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+  margin-right: 5px;
+}
+.recipes-container button:hover {
+  background: #2980b9;
+}
+.recipes-container thead, .recipes-container tbody {
+  width: 60%;
+  margin: auto; 
+}
+#delete-button:hover{
+  background: #e74c3c !important;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: var(--primary);
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 30px;
+  cursor: pointer;
+  color: var(--text-dark);
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--secondary);
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.ingredient-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ingredient-input input {
+  flex: 1;
+}
+
+.ingredient-input button {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ingredients-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.ingredients-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background: var(--light);
+  margin-bottom: 5px;
+  border-radius: 4px;
+}
+
+.ingredients-list button {
+  background: var(--secondary);
+  color: white;
+  border: none;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-cancel {
+  background: #95a5a6;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #7f8c8d;
+}
+
+.btn-save {
+  background: var(--success);
+  color: white;
+}
+
+.btn-save:hover {
+  background: #229954;
 }
