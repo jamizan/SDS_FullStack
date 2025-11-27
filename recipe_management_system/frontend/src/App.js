@@ -4,6 +4,7 @@ import Dashboard from './pages/Dashboard.jsx';
 import Header from './components/Header.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import Recipes from './pages/Recipes.jsx';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path='/' element={<Dashboard />} />
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
+          <Route path='/recipes' element={<Recipes />} />
         </Routes>
       </div>
     </Router>

@@ -53,7 +53,7 @@ function Login() {
 
   return (
     <>
-      <section className="heading">
+      <section className="head">
         <h1>
           <FaSignInAlt /> Login
         </h1>
