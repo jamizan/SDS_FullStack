@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAllRecipes, updateRecipe, addRecipe, deleteRecipe, clearState } from "../features/recipes/recipeSlice";
+import { addRecipeToGroceryList } from "../features/grocery/grocerySlice";
 import RecipeTable from "../components/RecipeTable"
 
 function Recipes() {
@@ -21,6 +22,10 @@ function Recipes() {
     }
   };
 
+  const handleAddToGroceryList = (recipeId) => {
+    dispatch(addRecipeToGroceryList(recipeId));
+  };
+
   useEffect(() => {
     if (isError) {
       console.error(message);
@@ -36,7 +41,7 @@ function Recipes() {
     <div className="recipes-container">
         <h2>Recipes Page</h2>
         <p>List of all recipes will be displayed here.</p>
-        <RecipeTable recipes={recipes} onUpdate={handleUpdate} onCreate={handleCreate} onDelete={handleDelete} />
+        <RecipeTable recipes={recipes} onUpdate={handleUpdate} onCreate={handleCreate} onDelete={handleDelete} onAddToGroceryList={handleAddToGroceryList} />
     </div>
   )
 }

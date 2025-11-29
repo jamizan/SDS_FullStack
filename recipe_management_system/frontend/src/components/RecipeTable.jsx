@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import RecipeModal from './RecipeModal.jsx';
 
-function RecipeTable({ recipes, showActions = true, columns = ['title', 'description', 'time'], onUpdate, onCreate, onDelete }) {
+function RecipeTable({ recipes, showActions = true, columns = ['title', 'description', 'time'], onUpdate, onCreate, onDelete, onAddToGroceryList }) {
   const [expandedId, setExpandedId] = useState(null);
   const [editingRecipe, setEditingRecipe] = useState(null);
 
@@ -71,7 +71,7 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
               {showActions && (
                 <td onClick={(e) => e.stopPropagation()}>
                     <button onClick={() => handleEdit(recipe)}>Edit</button>
-                    <button>Add to List</button>
+                    <button onClick={() => onAddToGroceryList(recipe._id)}>Add to List</button>
                     <button id="delete-button" onClick={() => onDelete(recipe._id)}>Delete</button>
                 </td>
               )}
@@ -83,7 +83,9 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
                     <h3>Ingredients:</h3>
                     <ul>
                       {recipe.ingredients.map((ingredient, idx) => (
-                        <li key={idx}>{ingredient}</li>
+                        <li key={idx}>
+                          {typeof ingredient === 'string' ? ingredient : `${ingredient.amount} ${ingredient.name}`}
+                        </li>
                       ))}
                     </ul>
                     <h3>Instructions:</h3>

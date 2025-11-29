@@ -5,6 +5,7 @@ import Header from './components/Header.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Recipes from './pages/Recipes.jsx';
+import Groceries from './pages/Groceries.jsx';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
           <Route path='/recipes' element={<Recipes />} />
+          <Route path='/groceries' element={<Groceries />} />
         </Routes>
       </div>
     </Router>

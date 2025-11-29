@@ -22,7 +22,7 @@ function RecipeModal({ recipe, onClose, onSave }) {
     }
   }, [recipe]);
 
-  const [ingredientInput, setIngredientInput] = useState('');
+  const [ingredientInput, setIngredientInput] = useState({ name: '', amount: '' });
 
   const onChange = (e) => {
     setFormData((prevState) => ({
@@ -32,12 +32,12 @@ function RecipeModal({ recipe, onClose, onSave }) {
   };
 
   const addIngredient = () => {
-    if (ingredientInput.trim()) {
+    if (ingredientInput.name.trim() && ingredientInput.amount.trim()) {
       setFormData((prevState) => ({
         ...prevState,
-        ingredients: [...prevState.ingredients, ingredientInput.trim()],
+        ingredients: [...prevState.ingredients, { name: ingredientInput.name.trim(), amount: ingredientInput.amount.trim() }],
       }));
-      setIngredientInput('');
+      setIngredientInput({ name: '', amount: '' });
     }
   };
 
@@ -99,16 +99,23 @@ function RecipeModal({ recipe, onClose, onSave }) {
             <div className="ingredient-input">
               <input
                 type="text"
-                value={ingredientInput}
-                onChange={(e) => setIngredientInput(e.target.value)}
-                placeholder="Add an ingredient"
+                value={ingredientInput.amount}
+                onChange={(e) => setIngredientInput({ ...ingredientInput, amount: e.target.value })}
+                placeholder="Amount"
+                style={{ flex: '0 0 150px' }}
+              />
+              <input
+                type="text"
+                value={ingredientInput.name}
+                onChange={(e) => setIngredientInput({ ...ingredientInput, name: e.target.value })}
+                placeholder="Ingredient name"
               />
               <button type="button" onClick={addIngredient}>Add</button>
             </div>
             <ul className="ingredients-list">
               {formData.ingredients.map((ingredient, index) => (
                 <li key={index}>
-                  {ingredient}
+                  <span><strong>{typeof ingredient === 'string' ? '' : ingredient.amount}</strong> {typeof ingredient === 'string' ? ingredient : ingredient.name}</span>
                   <button type="button" onClick={() => removeIngredient(index)}>&times;</button>
                 </li>
               ))}
