@@ -64,7 +64,7 @@ function Register() {
 
   return (
     <>
-      <section className="heading">
+      <section className="head">
         <h1>
           <FaUser /> Register
         </h1>
@@ -119,7 +119,7 @@ function Register() {
           </div>
           <div className="form-group">
             <button type='submit' className="btn btn-block">
-              Submit
+              Register
             </button>
           </div>
         </form>

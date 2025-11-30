@@ -91,6 +91,26 @@ body {
   color: var(--accent);
 }
 
+/* Login/Register styles */
+
+section.head, section.form {
+  width: 300px;
+  padding-top: 20px;
+  margin: auto;
+}
+.btn-block {
+  width: 100%;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  padding: 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+
 /* Recipes styles */
 .recipes-container table{
   padding: 20px;
@@ -227,7 +247,7 @@ body {
 
 .form-group input,
 .form-group textarea {
-  width: 100%;
+  width: 95%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
