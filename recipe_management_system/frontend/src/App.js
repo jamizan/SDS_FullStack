@@ -7,6 +7,7 @@ import Register from './pages/Register.jsx';
 import Recipes from './pages/Recipes.jsx';
 import Groceries from './pages/Groceries.jsx';
 import PrivateRoute from './components/PrivateRoute.jsx';
+import Profile from './pages/Profile.jsx';
 
 function App() {
   return (
@@ -29,6 +30,11 @@ function App() {
           <Route path='/groceries' element={
             <PrivateRoute>
               <Groceries />
+            </PrivateRoute>
+          } />
+          <Route path='/profile' element={
+            <PrivateRoute>
+              <Profile />
             </PrivateRoute>
           } />
         </Routes>

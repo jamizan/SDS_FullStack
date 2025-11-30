@@ -23,7 +23,11 @@ function Header() {
         <div className="user-links">
           {user ? (
             <>
-              <p><FaUser></FaUser> {user.name}</p>
+              <p>
+                <Link to='/profile'>
+                  <FaUser></FaUser> {user.name}
+                </Link>
+              </p>
               <button onClick={onLogout}>
                 <FaSignOutAlt /> Logout
               </button>
