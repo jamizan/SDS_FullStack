@@ -23,7 +23,7 @@ function Header() {
         <div className="user-links">
           {user ? (
             <>
-              <p>Welcome {user.name}</p>
+              <p><FaUser></FaUser> {user.name}</p>
               <button onClick={onLogout}>
                 <FaSignOutAlt /> Logout
               </button>

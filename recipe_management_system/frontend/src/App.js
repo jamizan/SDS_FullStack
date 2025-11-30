@@ -6,6 +6,7 @@ import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Recipes from './pages/Recipes.jsx';
 import Groceries from './pages/Groceries.jsx';
+import PrivateRoute from './components/PrivateRoute.jsx';
 
 function App() {
   return (
@@ -13,11 +14,23 @@ function App() {
       <div className='container'>
         <Header />
         <Routes>
-          <Route path='/' element={<Dashboard />} />
+          <Route path='/' element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          } />
           <Route path='/login' element={<Login />} />
           <Route path='/register' element={<Register />} />
-          <Route path='/recipes' element={<Recipes />} />
-          <Route path='/groceries' element={<Groceries />} />
+          <Route path='/recipes' element={
+            <PrivateRoute>
+              <Recipes />
+            </PrivateRoute>
+          } />
+          <Route path='/groceries' element={
+            <PrivateRoute>
+              <Groceries />
+            </PrivateRoute>
+          } />
         </Routes>
       </div>
     </Router>
