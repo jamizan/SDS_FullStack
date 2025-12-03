@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import RecipeModal from './RecipeModal.jsx';
 
-function RecipeTable({ recipes, showActions = true, columns = ['title', 'description', 'time'], onUpdate, onCreate, onDelete, onAddToGroceryList }) {
+function RecipeTable({ recipes, showActions = true, columns = ['title', 'description', 'time'], onUpdate, onCreate, onDelete, onAddToGroceryList, onShare, currentUserId }) {
   const [expandedId, setExpandedId] = useState(null);
   const [editingRecipe, setEditingRecipe] = useState(null);
 
@@ -72,6 +72,9 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
                 <td onClick={(e) => e.stopPropagation()}>
                     <button onClick={() => handleEdit(recipe)}>Edit</button>
                     <button onClick={() => onAddToGroceryList(recipe._id)}>Add to List</button>
+                    {(recipe.owner === currentUserId || (!recipe.owner && recipe.user === currentUserId)) && (
+                      <button className="share-button" onClick={() => onShare(recipe._id, recipe.title)}>Share</button>
+                    )}
                     <button id="delete-button" onClick={() => onDelete(recipe._id)}>Delete</button>
                 </td>
               )}

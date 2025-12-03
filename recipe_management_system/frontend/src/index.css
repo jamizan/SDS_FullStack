@@ -719,3 +719,234 @@ section.head, section.form {
   background: #e74c3c;
 }
 
+/* Friend Request Styles */
+.friend-requests-section {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+}
+
+.friend-requests-section h3 {
+  color: var(--primary);
+  margin-bottom: 20px;
+  font-size: 20px;
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 10px;
+}
+
+.friend-request-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: var(--light);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  border-left: 4px solid var(--accent);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.friend-request-card:hover {
+  transform: translateX(5px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.request-info h4 {
+  margin: 0 0 5px 0;
+  color: var(--primary);
+  font-size: 16px;
+}
+
+.request-info p {
+  margin: 0;
+  color: var(--secondary);
+  font-size: 14px;
+}
+
+.request-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-accept, .btn-reject {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  transition: all 0.3s;
+}
+
+.btn-accept {
+  background: var(--success);
+  color: white;
+}
+
+.btn-accept:hover {
+  background: #229954;
+  transform: scale(1.05);
+}
+
+.btn-reject {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-reject:hover {
+  background: #c0392b;
+  transform: scale(1.05);
+}
+
+.btn-remove-small {
+  background: var(--danger);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-remove-small:hover {
+  background: #c0392b;
+  transform: scale(1.08);
+}
+
+/* Recipe Filter Buttons */
+.filter-buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  justify-content: center;
+}
+
+.filter-btn {
+  background: var(--light);
+  color: var(--text-dark);
+  border: 2px solid var(--accent);
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.filter-btn:hover {
+  background: var(--accent);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+.filter-btn.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+}
+
+/* Share Recipe Button */
+.share-button {
+  background: var(--warning) !important;
+  color: white !important;
+}
+
+.share-button:hover {
+  background: #e67e22 !important;
+}
+
+/* Grocery List Sharing Styles */
+.groceries-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.grocery-share-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.btn-share-grocery {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.btn-share-grocery:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+.btn-stop-viewing {
+  background: var(--secondary);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.btn-stop-viewing:hover {
+  background: #c0392b;
+  transform: translateY(-2px);
+}
+
+.shared-with-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--text-dark);
+}
+
+.shared-friend-tag {
+  background: var(--light);
+  padding: 5px 10px;
+  border-radius: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--accent);
+}
+
+.btn-unshare-small {
+  background: var(--danger);
+  color: white;
+  border: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.btn-unshare-small:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+
+

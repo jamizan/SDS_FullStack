@@ -62,6 +62,26 @@ const toggleCustomItem = async (itemId, token) => {
   return result.data;
 };
 
+const shareGroceryList = async (friendId, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const result = await axios.post(API_URL + 'share', { friendId }, config);
+  return result.data;
+};
+
+const unshareGroceryList = async (friendId, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const result = await axios.post(API_URL + 'unshare', { friendId }, config);
+  return result.data;
+};
+
 const groceryService = {
   getGroceryList,
   addRecipeToList,
@@ -69,6 +89,8 @@ const groceryService = {
   addCustomItem,
   removeCustomItem,
   toggleCustomItem,
+  shareGroceryList,
+  unshareGroceryList,
 };
 
 export default groceryService;

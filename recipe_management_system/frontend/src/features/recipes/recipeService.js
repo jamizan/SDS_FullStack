@@ -2,14 +2,15 @@ import axios from 'axios';
 
 const API_URL = '/api/recipes/';
 
-const fetchRecipes = async (token) => {
+const fetchRecipes = async (filter, token) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
 
-  const result = await axios.get(API_URL, config);
+  const filterParam = filter ? `?filter=${filter}` : '';
+  const result = await axios.get(API_URL + filterParam, config);
   return result.data;
 };
 
@@ -44,11 +45,22 @@ const deleteRecipe = async (recipeId, token) => {
   return result.data;
 };
 
+const shareRecipe = async (recipeId, friendId, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const result = await axios.post(API_URL + recipeId + '/share', { friendId }, config);
+  return result.data;
+};
+
 const recipeService = {
   fetchRecipes,
   updateRecipe,
   addRecipe,
   deleteRecipe,
+  shareRecipe,
 };
 
 export default recipeService;

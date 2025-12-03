@@ -1,15 +1,23 @@
 const asyncHandler = require('express-async-handler');
 const GroceryList = require('../models/groceryListModel');
 const Recipe = require('../models/recipeModel');
+const User = require('../models/userModel');
 
 const getGroceryList = asyncHandler(async (req, res) => {
-  const groceryList = await GroceryList.findOne({ user: req.user.id }).populate('recipes');
+  // Find grocery list owned by user or shared with user
+  let groceryList = await GroceryList.findOne({
+    $or: [
+      { user: req.user.id },
+      { sharedWith: req.user.id }
+    ]
+  }).populate('recipes');
 
   if (!groceryList) {
     const newList = await GroceryList.create({
       user: req.user.id,
       recipes: [],
       customItems: [],
+      sharedWith: [],
     });
     return res.status(200).json(newList);
   }
@@ -125,6 +133,67 @@ const toggleCustomItem = asyncHandler(async (req, res) => {
   res.status(200).json(populatedList);
 });
 
+const shareGroceryList = asyncHandler(async (req, res) => {
+  const groceryList = await GroceryList.findOne({ user: req.user.id });
+
+  if (!groceryList) {
+    res.status(404);
+    throw new Error('Grocery list not found');
+  }
+
+  const { friendId } = req.body;
+
+  if (!friendId) {
+    res.status(400);
+    throw new Error('Please provide a friend ID');
+  }
+
+  // Verify friend exists
+  const friend = await User.findById(friendId);
+  if (!friend) {
+    res.status(404);
+    throw new Error('Friend not found');
+  }
+
+  // Check if already shared
+  if (groceryList.sharedWith.includes(friendId)) {
+    res.status(400);
+    throw new Error('Grocery list already shared with this user');
+  }
+
+  // Add friend to sharedWith array
+  groceryList.sharedWith.push(friendId);
+  await groceryList.save();
+
+  const populatedList = await GroceryList.findById(groceryList._id).populate('recipes');
+  res.status(200).json(populatedList);
+});
+
+const unshareGroceryList = asyncHandler(async (req, res) => {
+  const groceryList = await GroceryList.findOne({ user: req.user.id });
+
+  if (!groceryList) {
+    res.status(404);
+    throw new Error('Grocery list not found');
+  }
+
+  const { friendId } = req.body;
+
+  if (!friendId) {
+    res.status(400);
+    throw new Error('Please provide a friend ID');
+  }
+
+  // Remove friend from sharedWith array
+  groceryList.sharedWith = groceryList.sharedWith.filter(
+    (id) => id.toString() !== friendId
+  );
+  await groceryList.save();
+
+  const populatedList = await GroceryList.findById(groceryList._id).populate('recipes');
+  res.status(200).json(populatedList);
+});
+
 module.exports = {
   getGroceryList,
   addRecipeToList,
@@ -132,4 +201,6 @@ module.exports = {
   addCustomItem,
   removeCustomItem,
   toggleCustomItem,
+  shareGroceryList,
+  unshareGroceryList,
 };

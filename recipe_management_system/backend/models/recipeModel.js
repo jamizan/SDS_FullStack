@@ -36,6 +36,15 @@ const recipeSchema = mongoose.Schema(
             required: true,
             ref: 'User',
         },
+        owner: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: false,
+            ref: 'User',
+        },
+        sharedWith: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        }],
     },
     {
         timestamps: true,

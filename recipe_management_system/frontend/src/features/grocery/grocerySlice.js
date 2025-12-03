@@ -87,6 +87,32 @@ export const toggleCustomItemChecked = createAsyncThunk(
   }
 );
 
+export const shareGroceryList = createAsyncThunk(
+  'grocery/share',
+  async (friendId, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await groceryService.shareGroceryList(friendId, token);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const unshareGroceryList = createAsyncThunk(
+  'grocery/unshare',
+  async (friendId, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await groceryService.unshareGroceryList(friendId, token);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const grocerySlice = createSlice({
   name: 'grocery',
   initialState,
@@ -169,6 +195,32 @@ export const grocerySlice = createSlice({
         state.groceryList = action.payload;
       })
       .addCase(toggleCustomItemChecked.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(shareGroceryList.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(shareGroceryList.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.groceryList = action.payload;
+      })
+      .addCase(shareGroceryList.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(unshareGroceryList.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(unshareGroceryList.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.groceryList = action.payload;
+      })
+      .addCase(unshareGroceryList.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

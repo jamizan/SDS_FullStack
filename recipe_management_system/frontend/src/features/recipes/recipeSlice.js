@@ -11,10 +11,10 @@ const initialState = {
 
 export const fetchAllRecipes = createAsyncThunk(
   'recipes/fetchAll',
-  async (_, thunkAPI) => {
+  async (filter, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await recipeService.fetchRecipes(token);
+      return await recipeService.fetchRecipes(filter, token);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       return thunkAPI.rejectWithValue(message);
@@ -54,6 +54,19 @@ export const deleteRecipe = createAsyncThunk(
     try {
       const token = thunkAPI.getState().auth.user.token;
       return await recipeService.deleteRecipe(recipeId, token);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const shareRecipe = createAsyncThunk(
+  'recipes/share',
+  async ({ recipeId, friendId }, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await recipeService.shareRecipe(recipeId, friendId, token);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       return thunkAPI.rejectWithValue(message);
@@ -123,6 +136,22 @@ export const recipeSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.recipes = state.recipes.filter(r => r._id !== action.payload.id);
+      })
+      .addCase(shareRecipe.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(shareRecipe.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(shareRecipe.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        const index = state.recipes.findIndex(r => r._id === action.payload._id);
+        if (index !== -1) {
+          state.recipes[index] = action.payload;
+        }
       });
   },
 });

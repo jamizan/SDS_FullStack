@@ -29,6 +29,12 @@ const groceryListSchema = new mongoose.Schema(
         },
       },
     ],
+    sharedWith: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     timestamps: true,

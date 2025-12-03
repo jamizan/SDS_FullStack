@@ -1,12 +1,43 @@
 const asyncHandler = require('express-async-handler');
 
 const Recipe = require('../models/recipeModel');
+const User = require('../models/userModel');
 
 // @desc    Get All Recipes
-// @route   GET /api/recipes
+// @route   GET /api/recipes?filter=mine|shared|all
 // @access  Private
 const getRecipes = asyncHandler(async (req, res) => {
-    const recipes = await Recipe.find({ user: req.user.id });
+    const filter = req.query.filter || 'all';
+    let recipes;
+
+    if (filter === 'mine') {
+        // Only recipes where user is the owner (or user field for backward compatibility)
+        recipes = await Recipe.find({
+            $or: [
+                { owner: req.user.id },
+                { user: req.user.id, owner: { $exists: false } }
+            ]
+        });
+    } else if (filter === 'shared') {
+        // Only recipes shared with the user (not owned by them)
+        recipes = await Recipe.find({ 
+            sharedWith: req.user.id,
+            $or: [
+                { owner: { $ne: req.user.id } },
+                { user: { $ne: req.user.id }, owner: { $exists: false } }
+            ]
+        });
+    } else {
+        // All recipes: owned by user OR shared with user (with backward compatibility)
+        recipes = await Recipe.find({
+            $or: [
+                { owner: req.user.id },
+                { user: req.user.id, owner: { $exists: false } },
+                { sharedWith: req.user.id }
+            ]
+        });
+    }
+
     res.status(200).json(recipes);
 });
 
@@ -16,21 +47,27 @@ const getRecipes = asyncHandler(async (req, res) => {
 const getRecipe = asyncHandler(async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
 
+    if (!recipe) {
+        res.status(404);
+        throw new Error('Recipe not found');
+    }
+
     // Check for user
     if (!req.user) {
         res.status(401);
         throw new Error('User not found');
     }
 
-    if (recipe.user.toString() !== req.user.id) {
+    // User must be owner or have recipe shared with them (backward compatible)
+    const recipeOwnerId = recipe.owner || recipe.user;
+    const isOwner = recipeOwnerId.toString() === req.user.id;
+    const isSharedWith = recipe.sharedWith && recipe.sharedWith.some(userId => userId.toString() === req.user.id);
+
+    if (!isOwner && !isSharedWith) {
         res.status(401);
         throw new Error('User not authorized');
     }
 
-    if (!recipe) {
-        res.status(404);
-        throw new Error('Recipe not found');
-    }
     res.status(200).json(recipe);
 });
 
@@ -53,6 +90,8 @@ const createRecipe = asyncHandler(async (req, res) => {
         instructions,
         prepTime,
         user: req.user.id,
+        owner: req.user.id,
+        sharedWith: [],
     });
     res.status(201).json(recipe);
 });
@@ -64,20 +103,22 @@ const createRecipe = asyncHandler(async (req, res) => {
 const updateRecipe = asyncHandler(async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
 
+    if (!recipe) {
+        res.status(404);
+        throw new Error('Recipe not found');
+    }
+
     // Check for user
     if (!req.user) {
         res.status(401);
         throw new Error('User not found');
     }
 
-    if (recipe.user.toString() !== req.user.id) {
+    // Only owner can update (backward compatible)
+    const recipeOwnerId = recipe.owner || recipe.user;
+    if (recipeOwnerId.toString() !== req.user.id) {
         res.status(401);
         throw new Error('User not authorized');
-    }
-
-    if (!recipe) {
-        res.status(404);
-        throw new Error('Recipe not found');
     }
 
     const updatedRecipe = await Recipe.findByIdAndUpdate(req.params.id, req.body, {
@@ -92,24 +133,77 @@ const updateRecipe = asyncHandler(async (req, res) => {
 const deleteRecipe = asyncHandler(async (req, res) => {
     const recipe = await Recipe.findById(req.params.id);
 
+    if (!recipe) {
+        res.status(404);
+        throw new Error('Recipe not found');
+    }
+
     // Check for user
     if (!req.user) {
         res.status(401);
         throw new Error('User not found');
     }
 
-    if (recipe.user.toString() !== req.user.id) {
+    // Only owner can delete (backward compatible)
+    const recipeOwnerId = recipe.owner || recipe.user;
+    if (recipeOwnerId.toString() !== req.user.id) {
         res.status(401);
         throw new Error('User not authorized');
     }
+
+    await recipe.deleteOne();
+    res.status(200).json({ id: req.params.id });
+});
+
+// @desc    Share Recipe with Friend
+// @route   POST /api/recipes/:id/share
+// @access  Private
+const shareRecipe = asyncHandler(async (req, res) => {
+    const recipe = await Recipe.findById(req.params.id);
 
     if (!recipe) {
         res.status(404);
         throw new Error('Recipe not found');
     }
 
-    await recipe.deleteOne();
-    res.status(200).json({ id: req.params.id });
+    // Check for user
+    if (!req.user) {
+        res.status(401);
+        throw new Error('User not found');
+    }
+
+    // Only owner can share (backward compatible)
+    const recipeOwnerId = recipe.owner || recipe.user;
+    if (recipeOwnerId.toString() !== req.user.id) {
+        res.status(401);
+        throw new Error('Only the owner can share this recipe');
+    }
+
+    const { friendId } = req.body;
+
+    if (!friendId) {
+        res.status(400);
+        throw new Error('Please provide a friend ID');
+    }
+
+    // Verify friend exists
+    const friend = await User.findById(friendId);
+    if (!friend) {
+        res.status(404);
+        throw new Error('Friend not found');
+    }
+
+    // Check if already shared
+    if (recipe.sharedWith.includes(friendId)) {
+        res.status(400);
+        throw new Error('Recipe already shared with this user');
+    }
+
+    // Add friend to sharedWith array
+    recipe.sharedWith.push(friendId);
+    await recipe.save();
+
+    res.status(200).json(recipe);
 });
 
 
@@ -119,4 +213,5 @@ module.exports = {
     createRecipe,
     updateRecipe,
     deleteRecipe,
+    shareRecipe,
 };
