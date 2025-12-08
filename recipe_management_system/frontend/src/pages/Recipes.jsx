@@ -28,7 +28,13 @@ function Recipes() {
   };
 
   const handleAddToGroceryList = (recipeId) => {
-    dispatch(addRecipeToGroceryList(recipeId));
+    dispatch(addRecipeToGroceryList(recipeId)).then((result) => {
+      if (result.meta.requestStatus === 'fulfilled') {
+        alert('Recipe added to grocery list!');
+      } else {
+        alert('Failed to add recipe to grocery list');
+      }
+    });
   };
 
   const handleShare = (recipeId, recipeTitle, sharedWith = []) => {

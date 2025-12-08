@@ -87,6 +87,23 @@ export const unShareRecipe = createAsyncThunk(
   }
 );
 
+export const toggleIngredientChecked = createAsyncThunk(
+  'recipes/toggleIngredientChecked',
+  async (ingredientName, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await recipeService.toggleIngredientChecked(ingredientName, token);
+    } catch (error) {
+      const message = (
+        error.response && error.response.data && error.response.data.message ||
+        error.message ||
+        error.toString()
+      );
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const recipeSlice = createSlice({
   name: 'recipe',
   initialState,
@@ -182,6 +199,19 @@ export const recipeSlice = createSlice({
         if (index !== -1) {
           state.recipes[index] = action.payload;
         }
+      })
+      .addCase(toggleIngredientChecked.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(toggleIngredientChecked.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(toggleIngredientChecked.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.groceryList = action.payload;
       });
 
   },

@@ -67,6 +67,17 @@ const unShareRecipe = async (recipeId, friendId, token) => {
   return result.data;
 };
 
+const toggleIngredientChecked = async (ingredientName, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+
+  const response = await axios.put(API_URL + 'toggle-ingredient', { ingredientName }, config);
+  return response.data;
+};
+
 const recipeService = {
   fetchRecipes,
   updateRecipe,
@@ -74,6 +85,7 @@ const recipeService = {
   deleteRecipe,
   shareRecipe,
   unShareRecipe,
+  toggleIngredientChecked,
 };
 
 export default recipeService;

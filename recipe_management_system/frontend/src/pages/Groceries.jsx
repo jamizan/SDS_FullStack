@@ -8,10 +8,10 @@ import {
   toggleCustomItemChecked,
   shareGroceryList,
   unshareGroceryList,
+  toggleIngredientChecked,
   clearState,
 } from '../features/grocery/grocerySlice';
 import { getFriends } from '../features/friends/friendSlice';
-import ShareRecipeModal from '../components/ShareRecipeModal';
 
 function Groceries() {
   const dispatch = useDispatch();
@@ -19,7 +19,6 @@ function Groceries() {
   const { user } = useSelector((state) => state.auth);
   const { friends } = useSelector((state) => state.friends);
   const [customItemInput, setCustomItemInput] = useState({ name: '', amount: '' });
-  const [checkedIngredients, setCheckedIngredients] = useState([]);
   const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
@@ -37,7 +36,13 @@ function Groceries() {
 
   const handleRemoveRecipe = (recipeId) => {
     if (window.confirm('Remove this recipe from grocery list?')) {
-      dispatch(removeRecipeFromGroceryList(recipeId));
+      dispatch(removeRecipeFromGroceryList(recipeId)).then((result) => {
+        if (result.meta.requestStatus === 'fulfilled') {
+          alert('Recipe removed from grocery list');
+        } else {
+          alert('Failed to remove recipe');
+        }
+      });
     }
   };
 
@@ -57,13 +62,7 @@ function Groceries() {
   };
 
   const handleToggleIngredient = (ingredientName) => {
-    setCheckedIngredients((prev) => {
-      if (prev.includes(ingredientName)) {
-        return prev.filter((name) => name !== ingredientName);
-      } else {
-        return [...prev, ingredientName];
-      }
-    });
+    dispatch(toggleIngredientChecked(ingredientName));
   };
 
   const handleShareGroceryList = async (friendId) => {
@@ -198,7 +197,7 @@ function Groceries() {
 
         <ul className="grocery-items">
           {aggregatedIngredients.map((ingredient, idx) => {
-            const isChecked = checkedIngredients.includes(ingredient.name);
+            const isChecked = groceryList?.checkedIngredients?.includes(ingredient.name) || false;
             return (
               <li key={idx} className={`grocery-item ${isChecked ? 'checked' : ''}`}>
                 <input

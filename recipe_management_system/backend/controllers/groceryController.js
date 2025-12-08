@@ -158,6 +158,41 @@ const toggleCustomItem = asyncHandler(async (req, res) => {
   res.status(200).json(populatedList);
 });
 
+const toggleIngredientChecked = asyncHandler(async (req, res) => {
+  const { ingredientName } = req.body;
+
+  if (!ingredientName) {
+    res.status(400);
+    throw new Error('Please provide ingredient name');
+  }
+
+  const groceryList = await GroceryList.findOne({
+    $or: [
+      { user: req.user.id },
+      { sharedWith: req.user.id }
+    ]
+  }).populate('recipes');
+
+  if (!groceryList) {
+    res.status(404);
+    throw new Error('Grocery list not found');
+  }
+
+  const index = groceryList.checkedIngredients.indexOf(ingredientName);
+  if (index > -1) {
+    groceryList.checkedIngredients.splice(index, 1);
+  } else {
+    groceryList.checkedIngredients.push(ingredientName);
+  }
+
+  await groceryList.save();
+  
+  // Re-populate recipes after saving
+  await groceryList.populate('recipes');
+  
+  res.status(200).json(groceryList);
+});
+
 const shareGroceryList = asyncHandler(async (req, res) => {
   const groceryList = await GroceryList.findOne({ user: req.user.id });
 
@@ -236,6 +271,7 @@ module.exports = {
   addCustomItem,
   removeCustomItem,
   toggleCustomItem,
+  toggleIngredientChecked,
   shareGroceryList,
   unshareGroceryList,
 };

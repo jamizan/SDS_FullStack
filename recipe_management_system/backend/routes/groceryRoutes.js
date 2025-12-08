@@ -7,6 +7,7 @@ const {
   addCustomItem,
   removeCustomItem,
   toggleCustomItem,
+  toggleIngredientChecked,
   shareGroceryList,
   unshareGroceryList,
 } = require('../controllers/groceryController');
@@ -18,6 +19,7 @@ router.delete('/recipe/:id', protect, removeRecipeFromList);
 router.post('/custom', protect, addCustomItem);
 router.delete('/custom/:id', protect, removeCustomItem);
 router.put('/custom/:id/toggle', protect, toggleCustomItem);
+router.put('/toggle-ingredient', protect, toggleIngredientChecked);
 router.post('/share', protect, shareGroceryList);
 router.post('/unshare', protect, unshareGroceryList);
 

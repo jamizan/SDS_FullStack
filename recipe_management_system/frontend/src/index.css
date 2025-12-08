@@ -792,7 +792,7 @@ section.head, section.form {
 }
 
 .btn-reject {
-  background: var(--danger);
+  background: var(--accent);
   color: white;
 }
 
@@ -802,7 +802,7 @@ section.head, section.form {
 }
 
 .btn-remove-small {
-  background: var(--danger);
+  background: var(--accent);
   color: white;
   border: none;
   padding: 6px 12px;

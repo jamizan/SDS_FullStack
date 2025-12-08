@@ -20,7 +20,7 @@ function Login() {
 
   useEffect(() => {
     if (isError) {
-      toast.error(message);
+      alert(message || 'Login failed. Please check your credentials.');
     } 
     if (isSuccess || user) {
       navigate('/');

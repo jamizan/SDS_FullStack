@@ -24,6 +24,7 @@ function FriendRequestModal({ onClose }) {
 
     try {
       await dispatch(sendFriendRequest(email)).unwrap();
+      alert('Friend request sent successfully!');
       onClose();
     } catch (err) {
       setError(err || 'Failed to send friend request');

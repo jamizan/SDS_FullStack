@@ -113,6 +113,19 @@ export const unshareGroceryList = createAsyncThunk(
   }
 );
 
+export const toggleIngredientChecked = createAsyncThunk(
+  'grocery/toggleIngredient',
+  async (ingredientName, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await groceryService.toggleIngredient(ingredientName, token);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
 export const grocerySlice = createSlice({
   name: 'grocery',
   initialState,
@@ -221,6 +234,19 @@ export const grocerySlice = createSlice({
         state.groceryList = action.payload;
       })
       .addCase(unshareGroceryList.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(toggleIngredientChecked.pending, (state) => {
+        // Don't set loading to avoid UI flickering
+      })
+      .addCase(toggleIngredientChecked.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.groceryList = action.payload;
+      })
+      .addCase(toggleIngredientChecked.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;

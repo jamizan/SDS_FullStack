@@ -29,6 +29,11 @@ const groceryListSchema = new mongoose.Schema(
         },
       },
     ],
+    checkedIngredients: [
+      {
+        type: String,
+      },
+    ],
     sharedWith: [
       {
         type: mongoose.Schema.Types.ObjectId,

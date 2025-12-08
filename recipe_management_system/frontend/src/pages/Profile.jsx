@@ -25,17 +25,38 @@ function Profile() {
   }, [dispatch]);
 
   const handleAcceptRequest = (requestId) => {
-    dispatch(acceptFriendRequest(requestId));
-    dispatch(getFriends());
+    dispatch(acceptFriendRequest(requestId)).then((result) => {
+      if (result.meta.requestStatus === 'fulfilled') {
+        alert('Friend request accepted successfully!');
+        dispatch(getFriends());
+      } else {
+        alert('Failed to accept friend request');
+      }
+    });
   };
 
   const handleRejectRequest = (requestId) => {
-    dispatch(rejectFriendRequest(requestId));
+    if (window.confirm('Are you sure you want to reject this friend request?')) {
+      dispatch(rejectFriendRequest(requestId)).then((result) => {
+        if (result.meta.requestStatus === 'fulfilled') {
+          alert('Friend request rejected');
+        } else {
+          alert('Failed to reject friend request');
+        }
+      });
+    }
   };
 
   const handleRemoveFriend = (friendId) => {
     if (window.confirm('Are you sure you want to remove this friend?')) {
-      dispatch(removeFriend(friendId));
+      dispatch(removeFriend(friendId)).then((result) => {
+        if (result.meta.requestStatus === 'fulfilled') {
+          alert('Friend removed successfully');
+          dispatch(getFriends());
+        } else {
+          alert('Failed to remove friend');
+        }
+      });
     }
   };
 
@@ -135,7 +156,7 @@ function Profile() {
             ) : (
               friends.map((friend, index) => (
                 <tr key={friend._id}>
-                  <th>Friend {index + 1}:</th>
+                  <th>{index + 1}</th>
                   <td>{friend.name} ({friend.email})</td>
                   <td>
                     <button

@@ -83,6 +83,16 @@ const unshareGroceryList = async (friendId, token) => {
   return result.data;
 };
 
+const toggleIngredient = async (ingredientName, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const result = await axios.put(API_URL + 'toggle-ingredient', { ingredientName }, config);
+  return result.data;
+};
+
 const groceryService = {
   getGroceryList,
   addRecipeToList,
@@ -92,6 +102,7 @@ const groceryService = {
   toggleCustomItem,
   shareGroceryList,
   unshareGroceryList,
+  toggleIngredient,
 };
 
 export default groceryService;
