@@ -206,6 +206,45 @@ const shareRecipe = asyncHandler(async (req, res) => {
     res.status(200).json(recipe);
 });
 
+const unshareRecipe = asyncHandler(async (req, res) => {
+    const recipe = await Recipe.findById(req.params.id);
+    
+    if (!recipe) {
+        res.status(404);
+        throw new Error('Recipe not found');
+    }
+
+    if (!req.user) {
+        res.status(401);
+        throw new Error('User not found');
+    }
+
+    const recipeOwnerId = recipe.owner || recipe.user;
+    const isOwner = recipeOwnerId.toString() === req.user.id;
+    const { friendId } = req.body;
+
+    if (isOwner && friendId) {
+        // Owner removing someone from sharedWith
+        if (!recipe.sharedWith.includes(friendId)) {
+            res.status(400);
+            throw new Error('Recipe not shared with this user');
+        }
+        recipe.sharedWith = recipe.sharedWith.filter(
+            (id) => id.toString() !== friendId
+        );
+    } else if (recipe.sharedWith.some(id => id.toString() === req.user.id)) {
+        // User removing themselves from sharedWith
+        recipe.sharedWith = recipe.sharedWith.filter(
+            (id) => id.toString() !== req.user.id
+        );
+    } else {
+        res.status(401);
+        throw new Error('Not authorized to unshare this recipe');
+    }
+
+    await recipe.save();
+    res.status(200).json(recipe);
+});
 
 module.exports = {
     getRecipes,
@@ -214,4 +253,5 @@ module.exports = {
     updateRecipe,
     deleteRecipe,
     shareRecipe,
+    unshareRecipe,
 };

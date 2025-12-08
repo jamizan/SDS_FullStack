@@ -55,12 +55,23 @@ const shareRecipe = async (recipeId, friendId, token) => {
   return result.data;
 };
 
+const unShareRecipe = async (recipeId, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const result = await axios.post(API_URL + recipeId + '/unshare', {}, config);
+  return result.data;
+};
+
 const recipeService = {
   fetchRecipes,
   updateRecipe,
   addRecipe,
   deleteRecipe,
   shareRecipe,
+  unShareRecipe,
 };
 
 export default recipeService;

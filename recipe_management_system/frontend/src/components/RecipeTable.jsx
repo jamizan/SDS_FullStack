@@ -1,52 +1,15 @@
 import React, { useState } from 'react';
 import RecipeModal from './RecipeModal.jsx';
 
-function RecipeTable({ recipes, showActions = true, columns = ['title', 'description', 'time'], onUpdate, onCreate, onDelete, onAddToGroceryList, onShare, currentUserId }) {
+function RecipeTable({ recipes, showActions = true, columns = ['title', 'description', 'time'], onUpdate, onCreate, onDelete, onAddToGroceryList, onShare, onUnShare, onEdit, currentUserId, editingRecipe, onCloseModal, onSave }) {
   const [expandedId, setExpandedId] = useState(null);
-  const [editingRecipe, setEditingRecipe] = useState(null);
 
   const toggleRow = (recipeId) => {
     setExpandedId(expandedId === recipeId ? null : recipeId);
   };
 
-  const handleEdit = (recipe) => {
-    setEditingRecipe(recipe);
-  };
-
-  const handleCloseModal = () => {
-    setEditingRecipe(null);
-  };
-
-  const handleSave = (updatedData) => {
-    if (editingRecipe._id) {
-      onUpdate(editingRecipe._id, updatedData);
-    } else {
-      onCreate(updatedData);
-    }
-    setEditingRecipe(null);
-  };
-
-  const handleAddNew = () => {
-    setEditingRecipe({
-      title: '',
-      description: '',
-      ingredients: [],
-      instructions: '',
-      prepTime: 0,
-    });
-  };
-
   return (
     <>
-    <div className='add-new-button-container'>
-      <button 
-        className='add-new-button' 
-        onClick={handleAddNew}
-        onClose={handleCloseModal}
-      >
-        Add New Recipe
-      </button>
-    </div>
     <table className="recipe-table">
       <thead>
         <tr>
@@ -70,11 +33,12 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
               {columns.includes('time') && <td>{recipe.prepTime} mins</td>}
               {showActions && (
                 <td onClick={(e) => e.stopPropagation()}>
-                    <button onClick={() => handleEdit(recipe)}>Edit</button>
+                    <button onClick={() => onEdit(recipe)}>Edit</button>
                     <button onClick={() => onAddToGroceryList(recipe._id)}>Add to List</button>
                     {(recipe.owner === currentUserId || (!recipe.owner && recipe.user === currentUserId)) && (
                       <button className="share-button" onClick={() => onShare(recipe._id, recipe.title)}>Share</button>
                     )}
+                    <button className="unshare-button" onClick={() => onUnShare(recipe._id)}>Unshare</button>
                     <button id="delete-button" onClick={() => onDelete(recipe._id)}>Delete</button>
                 </td>
               )}
@@ -102,11 +66,11 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
       </tbody>
       </table>
 
-      {editingRecipe && (
+      {editingRecipe && onCloseModal && onSave && (
         <RecipeModal
           recipe={editingRecipe}
-          onClose={handleCloseModal}
-          onSave={handleSave}
+          onClose={onCloseModal}
+          onSave={onSave}
         />
       )}
     </>

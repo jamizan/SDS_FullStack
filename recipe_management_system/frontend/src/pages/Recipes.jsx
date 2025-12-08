@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllRecipes, updateRecipe, addRecipe, deleteRecipe, clearState } from "../features/recipes/recipeSlice";
+import { fetchAllRecipes, updateRecipe, addRecipe, deleteRecipe, clearState, unShareRecipe } from "../features/recipes/recipeSlice";
 import { addRecipeToGroceryList } from "../features/grocery/grocerySlice";
 import RecipeTable from "../components/RecipeTable"
 import ShareRecipeModal from "../components/ShareRecipeModal";
@@ -11,6 +11,7 @@ function Recipes() {
   const { user } = useSelector((state) => state.auth);
   const [filter, setFilter] = useState('all');
   const [shareModal, setShareModal] = useState({ isOpen: false, recipeId: null, recipeTitle: '' });
+  const [editingRecipe, setEditingRecipe] = useState(null);
 
   const handleUpdate = (recipeId, updatedData) => {
     dispatch(updateRecipe({ recipeId, recipeData: updatedData }));
@@ -34,9 +35,40 @@ function Recipes() {
     setShareModal({ isOpen: true, recipeId, recipeTitle });
   };
 
+  const handleUnShare = (recipeId) => {
+    dispatch(unShareRecipe({ recipeId }));
+  };
+
   const handleFilterChange = (newFilter) => {
     setFilter(newFilter);
     dispatch(fetchAllRecipes(newFilter));
+  };
+
+  const handleAddNew = () => {
+    setEditingRecipe({
+      title: '',
+      description: '',
+      ingredients: [],
+      instructions: '',
+      prepTime: 0,
+    });
+  };
+
+  const handleEdit = (recipe) => {
+    setEditingRecipe(recipe);
+  };
+
+  const handleCloseModal = () => {
+    setEditingRecipe(null);
+  };
+
+  const handleSave = (updatedData) => {
+    if (editingRecipe?._id) {
+      handleUpdate(editingRecipe._id, updatedData);
+    } else {
+      handleCreate(updatedData);
+    }
+    setEditingRecipe(null);
   };
 
   useEffect(() => {
@@ -75,6 +107,12 @@ function Recipes() {
           >
             Shared with Me
           </button>
+          <button 
+            className='add-new-button' 
+            onClick={handleAddNew}
+          >
+            Add New Recipe
+          </button>
         </div>
 
         <RecipeTable 
@@ -84,7 +122,12 @@ function Recipes() {
           onDelete={handleDelete} 
           onAddToGroceryList={handleAddToGroceryList}
           onShare={handleShare}
+          onUnShare={handleUnShare}
+          onEdit={handleEdit}
           currentUserId={user?.id}
+          editingRecipe={editingRecipe}
+          onCloseModal={handleCloseModal}
+          onSave={handleSave}
         />
 
         <ShareRecipeModal 
