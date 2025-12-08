@@ -5,17 +5,19 @@ import {
   removeRecipeFromGroceryList,
   addCustomItemToList,
   removeCustomItemFromList,
+  removeAllItemsFromGroceryList,
   toggleCustomItemChecked,
   shareGroceryList,
   unshareGroceryList,
   toggleIngredientChecked,
   clearState,
+  setActiveList,
 } from '../features/grocery/grocerySlice';
 import { getFriends } from '../features/friends/friendSlice';
 
 function Groceries() {
   const dispatch = useDispatch();
-  const { groceryList, isLoading, isError, message } = useSelector((state) => state.grocery);
+  const { groceryList, groceryLists, activeListId, isLoading, isError, message } = useSelector((state) => state.grocery);
   const { user } = useSelector((state) => state.auth);
   const { friends } = useSelector((state) => state.friends);
   const [customItemInput, setCustomItemInput] = useState({ name: '', amount: '' });
@@ -23,7 +25,7 @@ function Groceries() {
 
   useEffect(() => {
     if (isError) {
-      console.error(message);
+      alert(message || 'An error occurred with the grocery list');
     }
 
     dispatch(fetchGroceryList());
@@ -62,7 +64,7 @@ function Groceries() {
   };
 
   const handleToggleIngredient = (ingredientName) => {
-    dispatch(toggleIngredientChecked(ingredientName));
+    dispatch(toggleIngredientChecked({ ingredientName, listId: activeListId }));
   };
 
   const handleShareGroceryList = async (friendId) => {
@@ -72,6 +74,18 @@ function Groceries() {
       setShowShareModal(false);
     } catch (error) {
       alert(error || 'Failed to share grocery list');
+    }
+  };
+
+  const handleRemoveAllItems = () => {
+    if (window.confirm('Are you sure you want to remove all items from the grocery list?')) {
+      dispatch(removeAllItemsFromGroceryList()).then((result) => {
+        if (result.meta.requestStatus === 'fulfilled') {
+          alert('All items removed from grocery list');
+        } else {
+          alert('Failed to remove items');
+        }
+      });
     }
   };
 
@@ -127,33 +141,50 @@ function Groceries() {
     <div className="groceries-container">
       <div className="groceries-header">
         <h2>Grocery List</h2>
-        {groceryList && user && groceryList.user === user._id && (
+        
+        {groceryLists && groceryLists.length > 1 && (
+          <div className="list-selector">
+            <label>Viewing: </label>
+            <select 
+              value={activeListId || ''} 
+              onChange={(e) => dispatch(setActiveList(e.target.value))}
+            >
+              {groceryLists.map((list) => (
+                <option key={list._id} value={list._id}>
+                  {list.user._id === user._id ? 'My List' : `${list.user.name}'s List`}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+        
+        {groceryList && user && (groceryList.user._id || groceryList.user) === user._id && (
           <div className="grocery-share-actions">
             <button className="btn-share-grocery" onClick={() => setShowShareModal(true)}>
               Share List
             </button>
+            <button className="btn-remove-all-groceries" onClick={handleRemoveAllItems}>
+              Remove All
+            </button>
             {groceryList?.sharedWith && groceryList.sharedWith.length > 0 && (
               <div className="shared-with-section">
                 <span>Shared with: </span>
-                {groceryList.sharedWith.map((userId) => {
-                  const friend = friends.find((f) => f._id === userId);
-                  return friend ? (
-                    <span key={userId} className="shared-friend-tag">
-                      {friend.name}
-                      <button 
-                        className="btn-unshare-small"
-                        onClick={() => handleUnshareWithFriend(userId)}
-                      >
-                        &times;
-                      </button>
-                    </span>
-                  ) : null;
-                })}
+                {groceryList.sharedWith.map((sharedUser) => (
+                  <span key={sharedUser._id || sharedUser} className="shared-friend-tag">
+                    {sharedUser.name || 'Unknown'}
+                    <button 
+                      className="btn-unshare-small"
+                      onClick={() => handleUnshareWithFriend(sharedUser._id || sharedUser)}
+                    >
+                      &times;
+                    </button>
+                  </span>
+                ))}
               </div>
             )}
           </div>
         )}
-        {groceryList && user && groceryList.user !== user._id && groceryList.sharedWith?.includes(user._id) && (
+        {groceryList && user && (groceryList.user._id || groceryList.user) !== user._id && groceryList.sharedWith?.some(u => (u._id || u) === user._id) && (
           <div className="grocery-share-actions">
             <button className="btn-stop-viewing" onClick={() => handleUnshareWithFriend(user._id)}>
               Stop Viewing This List

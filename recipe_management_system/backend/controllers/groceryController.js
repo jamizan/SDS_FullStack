@@ -4,25 +4,32 @@ const Recipe = require('../models/recipeModel');
 const User = require('../models/userModel');
 
 const getGroceryList = asyncHandler(async (req, res) => {
-  // Find grocery list owned by user or shared with user
-  let groceryList = await GroceryList.findOne({
+  const allLists = await GroceryList.find({
     $or: [
       { user: req.user.id },
       { sharedWith: req.user.id }
     ]
-  }).populate('recipes');
+  })
+    .populate('recipes')
+    .populate('user', 'name email')
+    .populate('sharedWith', 'name email');
 
-  if (!groceryList) {
+  if (allLists.length === 0) {
     const newList = await GroceryList.create({
       user: req.user.id,
       recipes: [],
       customItems: [],
       sharedWith: [],
     });
-    return res.status(200).json(newList);
+    
+    const populatedNewList = await GroceryList.findById(newList._id)
+      .populate('user', 'name email')
+      .populate('sharedWith', 'name email');
+    
+    return res.status(200).json([populatedNewList]);
   }
 
-  res.status(200).json(groceryList);
+  res.status(200).json(allLists);
 });
 
 const addRecipeToList = asyncHandler(async (req, res) => {
@@ -57,7 +64,34 @@ const addRecipeToList = asyncHandler(async (req, res) => {
     }
   }
 
-  const populatedList = await GroceryList.findById(groceryList._id).populate('recipes');
+  const populatedList = await GroceryList.findById(groceryList._id)
+    .populate('recipes')
+    .populate('user', 'name email')
+    .populate('sharedWith', 'name email');
+  res.status(200).json(populatedList);
+});
+
+const removeAllItemsFromList = asyncHandler(async (req, res) => {
+  const groceryList = await GroceryList.findOne({
+    $or: [
+      { user: req.user.id },
+      { sharedWith: req.user.id }
+    ]
+  });
+
+  if (!groceryList) {
+    res.status(404);
+    throw new Error('Grocery list not found');
+  }
+
+  groceryList.recipes = [];
+  groceryList.customItems = [];
+  groceryList.checkedIngredients = [];
+  await groceryList.save();
+  const populatedList = await GroceryList.findById(groceryList._id)
+    .populate('recipes')
+    .populate('user', 'name email')
+    .populate('sharedWith', 'name email');
   res.status(200).json(populatedList);
 });
 
@@ -77,6 +111,7 @@ const removeRecipeFromList = asyncHandler(async (req, res) => {
   groceryList.recipes = groceryList.recipes.filter(
     (id) => id.toString() !== req.params.id
   );
+  groceryList.checkedIngredients = [];
   await groceryList.save();
 
   const populatedList = await GroceryList.findById(groceryList._id).populate('recipes');
@@ -84,14 +119,20 @@ const removeRecipeFromList = asyncHandler(async (req, res) => {
 });
 
 const addCustomItem = asyncHandler(async (req, res) => {
-  const { name, amount } = req.body;
+  const { name, amount, listId } = req.body;
 
   if (!name) {
     res.status(400);
     throw new Error('Please provide item name');
   }
 
-  let groceryList = await GroceryList.findOne({
+  if (!listId) {
+    res.status(400);
+    throw new Error('Please provide list ID');
+  }
+
+  const groceryList = await GroceryList.findOne({
+    _id: listId,
     $or: [
       { user: req.user.id },
       { sharedWith: req.user.id }
@@ -99,22 +140,31 @@ const addCustomItem = asyncHandler(async (req, res) => {
   });
 
   if (!groceryList) {
-    groceryList = await GroceryList.create({
-      user: req.user.id,
-      recipes: [],
-      customItems: [{ name, amount: amount || '', checked: false }],
-    });
-  } else {
-    groceryList.customItems.push({ name, amount: amount || '', checked: false });
-    await groceryList.save();
+    res.status(404);
+    throw new Error('Grocery list not found');
   }
 
-  const populatedList = await GroceryList.findById(groceryList._id).populate('recipes');
+  const newItem = { name, amount: amount || '', checked: false };
+  groceryList.customItems.push(newItem);
+  await groceryList.save();
+
+  const populatedList = await GroceryList.findById(groceryList._id)
+    .populate('recipes')
+    .populate('user', 'name email')
+    .populate('sharedWith', 'name email');
   res.status(200).json(populatedList);
 });
 
 const removeCustomItem = asyncHandler(async (req, res) => {
+  const { listId } = req.query;
+
+  if (!listId) {
+    res.status(400);
+    throw new Error('Please provide list ID');
+  }
+
   const groceryList = await GroceryList.findOne({
+    _id: listId,
     $or: [
       { user: req.user.id },
       { sharedWith: req.user.id }
@@ -131,12 +181,23 @@ const removeCustomItem = asyncHandler(async (req, res) => {
   );
   await groceryList.save();
 
-  const populatedList = await GroceryList.findById(groceryList._id).populate('recipes');
+  const populatedList = await GroceryList.findById(groceryList._id)
+    .populate('recipes')
+    .populate('user', 'name email')
+    .populate('sharedWith', 'name email');
   res.status(200).json(populatedList);
 });
 
 const toggleCustomItem = asyncHandler(async (req, res) => {
+  const { listId } = req.query;
+
+  if (!listId) {
+    res.status(400);
+    throw new Error('Please provide list ID');
+  }
+
   const groceryList = await GroceryList.findOne({
+    _id: listId,
     $or: [
       { user: req.user.id },
       { sharedWith: req.user.id }
@@ -154,24 +215,36 @@ const toggleCustomItem = asyncHandler(async (req, res) => {
     await groceryList.save();
   }
 
-  const populatedList = await GroceryList.findById(groceryList._id).populate('recipes');
+  const populatedList = await GroceryList.findById(groceryList._id)
+    .populate('recipes')
+    .populate('user', 'name email')
+    .populate('sharedWith', 'name email');
   res.status(200).json(populatedList);
 });
 
 const toggleIngredientChecked = asyncHandler(async (req, res) => {
-  const { ingredientName } = req.body;
+  const { ingredientName, listId } = req.body;
 
   if (!ingredientName) {
     res.status(400);
     throw new Error('Please provide ingredient name');
   }
 
+  if (!listId) {
+    res.status(400);
+    throw new Error('Please provide list ID');
+  }
+
+  // Find the specific list by ID and verify user has access
   const groceryList = await GroceryList.findOne({
+    _id: listId,
     $or: [
       { user: req.user.id },
       { sharedWith: req.user.id }
     ]
-  }).populate('recipes');
+  }).populate('recipes')
+    .populate('user', 'name email')
+    .populate('sharedWith', 'name email');
 
   if (!groceryList) {
     res.status(404);
@@ -187,8 +260,10 @@ const toggleIngredientChecked = asyncHandler(async (req, res) => {
 
   await groceryList.save();
   
-  // Re-populate recipes after saving
+  // Re-populate all fields after saving
   await groceryList.populate('recipes');
+  await groceryList.populate('user', 'name email');
+  await groceryList.populate('sharedWith', 'name email');
   
   res.status(200).json(groceryList);
 });
@@ -225,7 +300,10 @@ const shareGroceryList = asyncHandler(async (req, res) => {
   groceryList.sharedWith.push(friendId);
   await groceryList.save();
 
-  const populatedList = await GroceryList.findById(groceryList._id).populate('recipes');
+  const populatedList = await GroceryList.findById(groceryList._id)
+    .populate('recipes')
+    .populate('user', 'name email')
+    .populate('sharedWith', 'name email');
   res.status(200).json(populatedList);
 });
 
@@ -260,7 +338,10 @@ const unshareGroceryList = asyncHandler(async (req, res) => {
 
   await groceryList.save();
 
-  const populatedList = await GroceryList.findById(groceryList._id).populate('recipes');
+  const populatedList = await GroceryList.findById(groceryList._id)
+    .populate('recipes')
+    .populate('user', 'name email')
+    .populate('sharedWith', 'name email');
   res.status(200).json(populatedList);
 });
 
@@ -270,6 +351,7 @@ module.exports = {
   removeRecipeFromList,
   addCustomItem,
   removeCustomItem,
+  removeAllItemsFromList,
   toggleCustomItem,
   toggleIngredientChecked,
   shareGroceryList,

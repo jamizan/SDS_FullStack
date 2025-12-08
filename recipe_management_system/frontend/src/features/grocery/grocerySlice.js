@@ -3,6 +3,8 @@ import groceryService from './groceryService';
 
 const initialState = {
   groceryList: null,
+  groceryLists: [],
+  activeListId: null,
   isError: false,
   isSuccess: false,
   isLoading: false,
@@ -53,7 +55,8 @@ export const addCustomItemToList = createAsyncThunk(
   async (itemData, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await groceryService.addCustomItem(itemData, token);
+      const activeListId = thunkAPI.getState().grocery.activeListId;
+      return await groceryService.addCustomItem({ ...itemData, listId: activeListId }, token);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       return thunkAPI.rejectWithValue(message);
@@ -66,7 +69,21 @@ export const removeCustomItemFromList = createAsyncThunk(
   async (itemId, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await groceryService.removeCustomItem(itemId, token);
+      const activeListId = thunkAPI.getState().grocery.activeListId;
+      return await groceryService.removeCustomItem({ itemId, listId: activeListId }, token);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message;
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
+
+export const removeAllItemsFromGroceryList = createAsyncThunk(
+  'grocery/removeAll',
+  async (_, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().auth.user.token;
+      return await groceryService.removeAllItemsFromList(token);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       return thunkAPI.rejectWithValue(message);
@@ -79,7 +96,8 @@ export const toggleCustomItemChecked = createAsyncThunk(
   async (itemId, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await groceryService.toggleCustomItem(itemId, token);
+      const activeListId = thunkAPI.getState().grocery.activeListId;
+      return await groceryService.toggleCustomItem({ itemId, listId: activeListId }, token);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       return thunkAPI.rejectWithValue(message);
@@ -115,10 +133,10 @@ export const unshareGroceryList = createAsyncThunk(
 
 export const toggleIngredientChecked = createAsyncThunk(
   'grocery/toggleIngredient',
-  async (ingredientName, thunkAPI) => {
+  async ({ ingredientName, listId }, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await groceryService.toggleIngredient(ingredientName, token);
+      return await groceryService.toggleIngredient({ ingredientName, listId }, token);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       return thunkAPI.rejectWithValue(message);
@@ -131,6 +149,14 @@ export const grocerySlice = createSlice({
   initialState,
   reducers: {
     clearState: () => initialState,
+    setActiveList: (state, action) => {
+      const listId = action.payload;
+      const list = state.groceryLists.find(l => l._id === listId);
+      if (list) {
+        state.activeListId = listId;
+        state.groceryList = list;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -140,7 +166,13 @@ export const grocerySlice = createSlice({
       .addCase(fetchGroceryList.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.groceryList = action.payload;
+        state.groceryLists = action.payload;
+        const ownList = action.payload.find(list => list.user._id === state.activeListId || list.user._id);
+        const activeList = ownList || action.payload[0];
+        if (activeList) {
+          state.activeListId = activeList._id;
+          state.groceryList = activeList;
+        }
       })
       .addCase(fetchGroceryList.rejected, (state, action) => {
         state.isLoading = false;
@@ -180,6 +212,10 @@ export const grocerySlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.groceryList = action.payload;
+        const index = state.groceryLists.findIndex(list => list._id === action.payload._id);
+        if (index !== -1) {
+          state.groceryLists[index] = action.payload;
+        }
       })
       .addCase(addCustomItemToList.rejected, (state, action) => {
         state.isLoading = false;
@@ -193,6 +229,10 @@ export const grocerySlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.groceryList = action.payload;
+        const index = state.groceryLists.findIndex(list => list._id === action.payload._id);
+        if (index !== -1) {
+          state.groceryLists[index] = action.payload;
+        }
       })
       .addCase(removeCustomItemFromList.rejected, (state, action) => {
         state.isLoading = false;
@@ -206,6 +246,10 @@ export const grocerySlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.groceryList = action.payload;
+        const index = state.groceryLists.findIndex(list => list._id === action.payload._id);
+        if (index !== -1) {
+          state.groceryLists[index] = action.payload;
+        }
       })
       .addCase(toggleCustomItemChecked.rejected, (state, action) => {
         state.isLoading = false;
@@ -245,8 +289,25 @@ export const grocerySlice = createSlice({
         state.isLoading = false;
         state.isSuccess = true;
         state.groceryList = action.payload;
+        const index = state.groceryLists.findIndex(list => list._id === action.payload._id);
+        if (index !== -1) {
+          state.groceryLists[index] = action.payload;
+        }
+      })
+      .addCase(removeAllItemsFromGroceryList.pending, (state) => {
+        state.isLoading = true;
       })
       .addCase(toggleIngredientChecked.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = true;
+        state.message = action.payload;
+      })
+      .addCase(removeAllItemsFromGroceryList.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isSuccess = true;
+        state.groceryList = action.payload;
+      })
+      .addCase(removeAllItemsFromGroceryList.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = true;
         state.message = action.payload;
@@ -254,5 +315,5 @@ export const grocerySlice = createSlice({
   },
 });
 
-export const { clearState } = grocerySlice.actions;
+export const { clearState, setActiveList } = grocerySlice.actions;
 export default grocerySlice.reducer;

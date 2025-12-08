@@ -10,7 +10,7 @@ function Dashboard() {
   const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchAllRecipes());
+    dispatch(fetchAllRecipes('mine'));
   }, [dispatch]);
 
   const totalRecipes = recipes.length;

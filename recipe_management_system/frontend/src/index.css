@@ -249,12 +249,51 @@ section.head, section.form {
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
   width: 95%;
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 12px 40px 12px 15px;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  background: white;
+  color: var(--text-dark);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 20px;
+}
+
+.form-group select:hover {
+  border-color: #2980b9;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-group select:focus {
+  border-color: #2980b9;
+  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2);
+}
+
+.form-group select option {
+  padding: 12px;
+  font-weight: 500;
+  background: white;
+}
+
+.form-group select option:hover {
+  background: #f8f9fa;
 }
 
 .form-group textarea {
@@ -866,6 +905,61 @@ section.head, section.form {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.groceries-header h2 {
+  flex: 1;
+}
+
+.list-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  padding: 8px 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-left: auto;
+}
+
+.list-selector label {
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 14px;
+}
+
+.list-selector select {
+  padding: 8px 35px 8px 12px;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  background: white;
+  color: var(--text-dark);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 20px;
+}
+
+.list-selector select:hover {
+  border-color: #2980b9;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.list-selector select:focus {
+  border-color: #2980b9;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.list-selector select option {
+  padding: 10px;
+  font-weight: 500;
 }
 
 .grocery-share-actions {
@@ -874,7 +968,8 @@ section.head, section.form {
   gap: 15px;
 }
 
-.btn-share-grocery {
+.btn-share-grocery,
+.btn-remove-all-groceries {
   background: var(--accent);
   color: white;
   border: none;
@@ -888,6 +983,11 @@ section.head, section.form {
 
 .btn-share-grocery:hover {
   background: #2980b9;
+  transform: translateY(-2px);
+}
+
+.btn-remove-all-groceries:hover {
+  background: #c0392b;
   transform: translateY(-2px);
 }
 

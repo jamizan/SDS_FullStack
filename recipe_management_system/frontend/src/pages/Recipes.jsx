@@ -86,7 +86,7 @@ function Recipes() {
 
   useEffect(() => {
     if (isError) {
-      console.error(message);
+      alert(message || 'An error occurred while fetching recipes');
     }
 
     dispatch(fetchAllRecipes(filter));
@@ -94,7 +94,7 @@ function Recipes() {
     return () => {
       dispatch(clearState());
     };
-  }, [dispatch, isError, message]);
+  }, [dispatch, isError, message, filter]);
   
   return (
     <div className="recipes-container">

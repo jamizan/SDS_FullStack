@@ -32,33 +32,43 @@ const removeRecipeFromList = async (recipeId, token) => {
   return result.data;
 };
 
-const addCustomItem = async (itemData, token) => {
+const addCustomItem = async (data, token) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-  const result = await axios.post(API_URL + 'custom', itemData, config);
+  const result = await axios.post(API_URL + 'custom', data, config);
   return result.data;
 };
 
-const removeCustomItem = async (itemId, token) => {
+const removeCustomItem = async (data, token) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-  const result = await axios.delete(API_URL + 'custom/' + itemId, config);
+  const result = await axios.delete(API_URL + 'custom/' + data.itemId + '?listId=' + data.listId, config);
   return result.data;
 };
 
-const toggleCustomItem = async (itemId, token) => {
+const removeAllItemsFromList = async (token) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-  const result = await axios.put(API_URL + 'custom/' + itemId + '/toggle', {}, config);
+  const result = await axios.delete(API_URL + 'all', config);
+  return result.data;
+};
+
+const toggleCustomItem = async (data, token) => {
+  const config = {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  };
+  const result = await axios.put(API_URL + 'custom/' + data.itemId + '/toggle?listId=' + data.listId, {}, config);
   return result.data;
 };
 
@@ -83,13 +93,13 @@ const unshareGroceryList = async (friendId, token) => {
   return result.data;
 };
 
-const toggleIngredient = async (ingredientName, token) => {
+const toggleIngredient = async (data, token) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-  const result = await axios.put(API_URL + 'toggle-ingredient', { ingredientName }, config);
+  const result = await axios.put(API_URL + 'toggle-ingredient', data, config);
   return result.data;
 };
 
@@ -99,6 +109,7 @@ const groceryService = {
   removeRecipeFromList,
   addCustomItem,
   removeCustomItem,
+  removeAllItemsFromList,
   toggleCustomItem,
   shareGroceryList,
   unshareGroceryList,

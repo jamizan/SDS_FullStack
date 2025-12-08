@@ -6,6 +6,7 @@ const {
   removeRecipeFromList,
   addCustomItem,
   removeCustomItem,
+  removeAllItemsFromList,
   toggleCustomItem,
   toggleIngredientChecked,
   shareGroceryList,
@@ -18,6 +19,7 @@ router.post('/recipe', protect, addRecipeToList);
 router.delete('/recipe/:id', protect, removeRecipeFromList);
 router.post('/custom', protect, addCustomItem);
 router.delete('/custom/:id', protect, removeCustomItem);
+router.delete('/all', protect, removeAllItemsFromList);
 router.put('/custom/:id/toggle', protect, toggleCustomItem);
 router.put('/toggle-ingredient', protect, toggleIngredientChecked);
 router.post('/share', protect, shareGroceryList);
