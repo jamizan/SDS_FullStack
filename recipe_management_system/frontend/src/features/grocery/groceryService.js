@@ -78,7 +78,8 @@ const unshareGroceryList = async (friendId, token) => {
       Authorization: `Bearer ${token}`,
     },
   };
-  const result = await axios.post(API_URL + 'unshare', { friendId }, config);
+  const body = friendId ? { friendId } : {};
+  const result = await axios.post(API_URL + 'unshare', body, config);
   return result.data;
 };
 

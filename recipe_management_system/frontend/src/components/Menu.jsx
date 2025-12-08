@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { NavLink } from "react-router-dom"
 import { useSelector } from "react-redux"
 
 function Menu() {
@@ -10,9 +10,9 @@ function Menu() {
 
   return (
     <div className="menu">
-      <Link to="/">Home</Link>
-      <Link to="/recipes">All Recipes</Link>
-      <Link to="/groceries">Groceries</Link>
+      <NavLink to="/" className={({ isActive }) => isActive ? 'active' : ''}>Dashboard</NavLink>
+      <NavLink to="/recipes" className={({ isActive }) => isActive ? 'active' : ''}>Recipes</NavLink>
+      <NavLink to="/groceries" className={({ isActive }) => isActive ? 'active' : ''}>Groceries</NavLink>
     </div>
   )
 }

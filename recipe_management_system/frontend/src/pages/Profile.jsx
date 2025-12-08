@@ -1,5 +1,3 @@
-
-
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -10,12 +8,15 @@ import {
   removeFriend,
 } from '../features/friends/friendSlice';
 import FriendRequestModal from '../components/FriendRequestModal';
+import ChangePasswordModal from '../components/ChangePasswordModal';
+import authService from '../features/auth/authService';
 
 function Profile() {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
   const { friends, friendRequests } = useSelector((state) => state.friends);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [selectedFriend, setSelectedFriend] = useState(null);
 
   useEffect(() => {
@@ -35,6 +36,17 @@ function Profile() {
   const handleRemoveFriend = (friendId) => {
     if (window.confirm('Are you sure you want to remove this friend?')) {
       dispatch(removeFriend(friendId));
+    }
+  };
+
+  const handleChangePassword = async (passwordData) => {
+    try {
+      await authService.changePassword(passwordData, user.token);
+      alert('Password changed successfully!');
+      setShowPasswordModal(false);
+    } catch (error) {
+      const message = error.response?.data?.message || error.message || 'Failed to change password';
+      alert(message);
     }
   };
 
@@ -92,7 +104,7 @@ function Profile() {
             </tr>
             <tr>
               <td colSpan="2">
-                <button className="btn btn-block">Change Password</button>
+                <button className="btn btn-block" onClick={() => setShowPasswordModal(true)}>Change Password</button>
               </td>
             </tr>
           </tbody>
@@ -141,6 +153,13 @@ function Profile() {
       </div>
 
       {showAddModal && <FriendRequestModal onClose={() => setShowAddModal(false)} />}
+      {showPasswordModal && (
+        <ChangePasswordModal
+          isOpen={showPasswordModal}
+          onClose={() => setShowPasswordModal(false)}
+          onSubmit={handleChangePassword}
+        />
+      )}
     </div>
   );
 }

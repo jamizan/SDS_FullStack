@@ -77,10 +77,16 @@ function Groceries() {
   };
 
   const handleUnshareWithFriend = async (friendId) => {
-    if (window.confirm('Stop sharing grocery list with this friend?')) {
+    const isUnsharing = friendId === user._id;
+    const confirmMessage = isUnsharing 
+      ? 'Are you sure you want to stop viewing this grocery list?' 
+      : 'Stop sharing grocery list with this friend?';
+    
+    if (window.confirm(confirmMessage)) {
       try {
-        await dispatch(unshareGroceryList(friendId)).unwrap();
-        alert('Sharing ended successfully!');
+        await dispatch(unshareGroceryList(isUnsharing ? null : friendId)).unwrap();
+        alert(isUnsharing ? 'You are no longer viewing this list' : 'Sharing ended successfully!');
+        dispatch(fetchGroceryList());
       } catch (error) {
         alert(error || 'Failed to end sharing');
       }

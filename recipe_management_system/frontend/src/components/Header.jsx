@@ -1,4 +1,4 @@
-import {Link, useNavigate} from 'react-router-dom'
+import {Link, useNavigate, NavLink} from 'react-router-dom'
 import {FaSignInAlt, FaUser, FaSignOutAlt} from 'react-icons/fa'
 import {useSelector, useDispatch} from 'react-redux'
 import {logout, reset} from '../features/auth/authSlice'
@@ -16,7 +16,8 @@ function Header() {
   }
 
   return (
-    <header className='heading'>
+    <header className='header'>
+      <div className='heading'>
         <div className='menu-container'>
           <Menu />
         </div>
@@ -24,9 +25,9 @@ function Header() {
           {user ? (
             <>
               <p>
-                <Link to='/profile'>
+                <NavLink to='/profile' className={({ isActive }) => isActive ? 'active' : ''}>
                   <FaUser></FaUser> {user.name}
-                </Link>
+                </NavLink>
               </p>
               <button onClick={onLogout}>
                 <FaSignOutAlt /> Logout
@@ -46,7 +47,9 @@ function Header() {
               </div>
             </>
           )}
-        </div>    </header>
+        </div>
+      </div>
+    </header>
   )
 }
 

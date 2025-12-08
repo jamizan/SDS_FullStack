@@ -79,7 +79,6 @@ function RecipeModal({ recipe, onClose, onSave }) {
               value={formData.description}
               onChange={onChange}
               rows="3"
-              required
             />
           </div>
 

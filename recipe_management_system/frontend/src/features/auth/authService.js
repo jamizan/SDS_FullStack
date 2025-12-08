@@ -28,10 +28,22 @@ const logout = async () => {
     return{};
 }
 
+// Change password
+const changePassword = async (passwordData, token) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    };
+    const response = await axios.put(API_URL + 'change-password', passwordData, config);
+    return response.data;
+};
+
 const authService = {
     register,
     logout,
     login,
+    changePassword,
 };
 
 export default authService;

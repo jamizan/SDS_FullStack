@@ -34,7 +34,12 @@ const addRecipeToList = asyncHandler(async (req, res) => {
     throw new Error('Recipe not found');
   }
 
-  let groceryList = await GroceryList.findOne({ user: req.user.id });
+  let groceryList = await GroceryList.findOne({
+    $or: [
+      { user: req.user.id },
+      { sharedWith: req.user.id }
+    ]
+  });
 
   if (!groceryList) {
     groceryList = await GroceryList.create({
@@ -57,7 +62,12 @@ const addRecipeToList = asyncHandler(async (req, res) => {
 });
 
 const removeRecipeFromList = asyncHandler(async (req, res) => {
-  const groceryList = await GroceryList.findOne({ user: req.user.id });
+  const groceryList = await GroceryList.findOne({
+    $or: [
+      { user: req.user.id },
+      { sharedWith: req.user.id }
+    ]
+  });
 
   if (!groceryList) {
     res.status(404);
@@ -81,7 +91,12 @@ const addCustomItem = asyncHandler(async (req, res) => {
     throw new Error('Please provide item name');
   }
 
-  let groceryList = await GroceryList.findOne({ user: req.user.id });
+  let groceryList = await GroceryList.findOne({
+    $or: [
+      { user: req.user.id },
+      { sharedWith: req.user.id }
+    ]
+  });
 
   if (!groceryList) {
     groceryList = await GroceryList.create({
@@ -99,7 +114,12 @@ const addCustomItem = asyncHandler(async (req, res) => {
 });
 
 const removeCustomItem = asyncHandler(async (req, res) => {
-  const groceryList = await GroceryList.findOne({ user: req.user.id });
+  const groceryList = await GroceryList.findOne({
+    $or: [
+      { user: req.user.id },
+      { sharedWith: req.user.id }
+    ]
+  });
 
   if (!groceryList) {
     res.status(404);
@@ -116,7 +136,12 @@ const removeCustomItem = asyncHandler(async (req, res) => {
 });
 
 const toggleCustomItem = asyncHandler(async (req, res) => {
-  const groceryList = await GroceryList.findOne({ user: req.user.id });
+  const groceryList = await GroceryList.findOne({
+    $or: [
+      { user: req.user.id },
+      { sharedWith: req.user.id }
+    ]
+  });
 
   if (!groceryList) {
     res.status(404);
@@ -170,24 +195,34 @@ const shareGroceryList = asyncHandler(async (req, res) => {
 });
 
 const unshareGroceryList = asyncHandler(async (req, res) => {
-  const groceryList = await GroceryList.findOne({ user: req.user.id });
-
-  if (!groceryList) {
-    res.status(404);
-    throw new Error('Grocery list not found');
-  }
-
   const { friendId } = req.body;
 
-  if (!friendId) {
-    res.status(400);
-    throw new Error('Please provide a friend ID');
+  let groceryList;
+
+  if (friendId) {
+    groceryList = await GroceryList.findOne({ user: req.user.id });
+
+    if (!groceryList) {
+      res.status(404);
+      throw new Error('Grocery list not found');
+    }
+
+    groceryList.sharedWith = groceryList.sharedWith.filter(
+      (id) => id.toString() !== friendId
+    );
+  } else {
+    groceryList = await GroceryList.findOne({ sharedWith: req.user.id });
+
+    if (!groceryList) {
+      res.status(404);
+      throw new Error('Grocery list not found or not shared with you');
+    }
+
+    groceryList.sharedWith = groceryList.sharedWith.filter(
+      (id) => id.toString() !== req.user.id
+    );
   }
 
-  // Remove friend from sharedWith array
-  groceryList.sharedWith = groceryList.sharedWith.filter(
-    (id) => id.toString() !== friendId
-  );
   await groceryList.save();
 
   const populatedList = await GroceryList.findById(groceryList._id).populate('recipes');
