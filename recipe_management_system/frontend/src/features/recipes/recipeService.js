@@ -55,13 +55,15 @@ const shareRecipe = async (recipeId, friendId, token) => {
   return result.data;
 };
 
-const unShareRecipe = async (recipeId, token) => {
+const unShareRecipe = async (recipeId, friendId, token) => {
   const config = {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   };
-  const result = await axios.post(API_URL + recipeId + '/unshare', {}, config);
+  
+  const body = friendId ? { friendId } : {};
+  const result = await axios.post(API_URL + recipeId + '/unshare', body, config);
   return result.data;
 };
 

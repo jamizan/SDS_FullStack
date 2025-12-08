@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getFriends } from '../features/friends/friendSlice';
-import { shareRecipe } from '../features/recipes/recipeSlice';
+import { shareRecipe, unShareRecipe } from '../features/recipes/recipeSlice';
 
-function ShareRecipeModal({ isOpen, onClose, recipeId, recipeTitle }) {
+function ShareRecipeModal({ isOpen, onClose, recipeId, recipeTitle, sharedWith }) {
   const dispatch = useDispatch();
   const [selectedFriendId, setSelectedFriendId] = useState('');
   const { friends } = useSelector((state) => state.friends);
+  const { recipes } = useSelector((state) => state.recipe);
+  const currentRecipe = recipes.find(r => r._id === recipeId);
+  const currentSharedWith = currentRecipe?.sharedWith || sharedWith || [];
 
   useEffect(() => {
     if (isOpen) {
@@ -32,6 +35,21 @@ function ShareRecipeModal({ isOpen, onClose, recipeId, recipeTitle }) {
     }
   };
 
+  const handleUnshare = async (friendId) => {
+    if (window.confirm('Remove sharing with this friend?')) {
+      try {
+        await dispatch(unShareRecipe({ recipeId, friendId })).unwrap();
+        alert('Sharing removed successfully!');
+      } catch (error) {
+        alert(error || 'Failed to remove sharing');
+      }
+    }
+  };
+
+  const availableFriends = friends.filter(
+    friend => !currentSharedWith.some(shared => shared._id === friend._id)
+  );
+
   if (!isOpen) return null;
 
   return (
@@ -48,12 +66,33 @@ function ShareRecipeModal({ isOpen, onClose, recipeId, recipeTitle }) {
               required
             >
               <option value="">-- Choose a friend --</option>
-              {friends.map((friend) => (
+              {availableFriends.map((friend) => (
                 <option key={friend._id} value={friend._id}>
                   {friend.name} ({friend.email})
                 </option>
               ))}
             </select>
+          </div>
+          <div className="shared-list">
+            <h4>Already Shared With:</h4>
+            {currentSharedWith.length === 0 ? (
+              <p>This recipe is not shared with anyone yet.</p>
+            ) : (
+              <ul>
+                {currentSharedWith.map((user) => (
+                  <li key={user._id || user} className="shared-user-item">
+                    <span>{user.name || 'Unknown User'} ({user.email || 'No Email'})</span>
+                    <button 
+                      className="btn-unshare-recipe-small"
+                      onClick={() => handleUnshare(user._id)}
+                      type="button"
+                    >
+                      ×
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           <div className="modal-actions">
             <button type="button" className="btn-cancel" onClick={onClose}>

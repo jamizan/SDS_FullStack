@@ -15,7 +15,10 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
     const ownerId = (recipe.owner?._id || recipe.owner || recipe.user?._id || recipe.user)?.toString();
     const userId = currentUserId.toString();
     const isOwner = ownerId === userId;
-    const isInSharedWith = recipe.sharedWith?.some(id => id.toString() === userId);
+    const isInSharedWith = recipe.sharedWith?.some(user => {
+      const sharedUserId = user._id || user;
+      return sharedUserId.toString() === userId;
+    });
     
     return isInSharedWith && !isOwner;
   };
@@ -56,7 +59,7 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
                     <button onClick={() => onEdit(recipe)}>Edit</button>
                     <button onClick={() => onAddToGroceryList(recipe._id)}>Add to List</button>
                     {((recipe.owner?._id || recipe.owner) === currentUserId || (!recipe.owner && (recipe.user?._id || recipe.user) === currentUserId)) && (
-                      <button className="share-button" onClick={() => onShare(recipe._id, recipe.title)}>Share</button>
+                      <button className="share-button" onClick={() => onShare(recipe._id, recipe.title, recipe.sharedWith || [])}>Share</button>
                     )}
                     {isSharedWithMe(recipe) && (
                       <button className="unshare-button" onClick={() => onUnShare(recipe._id)}>Remove Shared Recipe</button>

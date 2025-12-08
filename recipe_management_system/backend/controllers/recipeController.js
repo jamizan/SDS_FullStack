@@ -19,7 +19,8 @@ const getRecipes = asyncHandler(async (req, res) => {
             ]
         })
         .populate('owner', 'name email')
-        .populate('user', 'name email');
+        .populate('user', 'name email')
+        .populate('sharedWith', 'name email');
     } else if (filter === 'shared') {
         // Only recipes shared with the user (not owned by them)
         recipes = await Recipe.find({ 
@@ -30,7 +31,8 @@ const getRecipes = asyncHandler(async (req, res) => {
             ]
         })
         .populate('owner', 'name email')
-        .populate('user', 'name email');
+        .populate('user', 'name email')
+        .populate('sharedWith', 'name email');
     } else {
         // All recipes: owned by user OR shared with user (with backward compatibility)
         recipes = await Recipe.find({
@@ -41,7 +43,8 @@ const getRecipes = asyncHandler(async (req, res) => {
             ]
         })
         .populate('owner', 'name email')
-        .populate('user', 'name email');
+        .populate('user', 'name email')
+        .populate('sharedWith', 'name email');
     }
 
     res.status(200).json(recipes);
@@ -209,7 +212,12 @@ const shareRecipe = asyncHandler(async (req, res) => {
     recipe.sharedWith.push(friendId);
     await recipe.save();
 
-    res.status(200).json(recipe);
+    const populatedRecipe = await Recipe.findById(recipe._id)
+        .populate('owner', 'name email')
+        .populate('user', 'name email')
+        .populate('sharedWith', 'name email');
+
+    res.status(200).json(populatedRecipe);
 });
 
 const unshareRecipe = asyncHandler(async (req, res) => {
@@ -231,7 +239,7 @@ const unshareRecipe = asyncHandler(async (req, res) => {
 
     if (isOwner && friendId) {
         // Owner removing someone from sharedWith
-        if (!recipe.sharedWith.includes(friendId)) {
+        if (!recipe.sharedWith.some(id => id.toString() === friendId)) {
             res.status(400);
             throw new Error('Recipe not shared with this user');
         }
@@ -249,7 +257,13 @@ const unshareRecipe = asyncHandler(async (req, res) => {
     }
 
     await recipe.save();
-    res.status(200).json(recipe);
+
+    const updatedRecipe = await Recipe.findById(recipe._id)
+        .populate('owner', 'name email')
+        .populate('user', 'name email')
+        .populate('sharedWith', 'name email');
+
+    res.status(200).json(updatedRecipe);
 });
 
 module.exports = {

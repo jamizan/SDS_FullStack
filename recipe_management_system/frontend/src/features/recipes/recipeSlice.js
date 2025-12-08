@@ -79,7 +79,7 @@ export const unShareRecipe = createAsyncThunk(
   async ({ recipeId, friendId }, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user.token;
-      return await recipeService.unShareRecipe(recipeId, token, friendId);
+      return await recipeService.unShareRecipe(recipeId, friendId, token);
     } catch (error) {
       const message = error.response?.data?.message || error.message;
       return thunkAPI.rejectWithValue(message);
@@ -177,7 +177,11 @@ export const recipeSlice = createSlice({
       .addCase(unShareRecipe.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isSuccess = true;
-        state.recipes = state.recipes.filter(recipe => recipe._id !== action.payload._id);
+        
+        const index = state.recipes.findIndex(r => r._id === action.payload._id);
+        if (index !== -1) {
+          state.recipes[index] = action.payload;
+        }
       });
 
   },

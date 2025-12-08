@@ -120,6 +120,11 @@ section.head, section.form {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   table-layout: fixed;
 }
+.recipes-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: var(--primary);
+}
 .recipe-table tr:hover {
   background-color: var(--hover) !important;
 }
@@ -151,6 +156,7 @@ section.head, section.form {
   font-weight: 500;
   transition: background 0.3s;
   margin-right: 5px;
+  margin-bottom: 5px;
 }
 .recipes-container button:hover {
   background: #2980b9;
@@ -161,23 +167,6 @@ section.head, section.form {
 }
 #delete-button:hover{
   background: #e74c3c !important;
-}
-.add-new-button {
-  background: var(--success);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  margin-bottom: 5px;
-  transition: background 0.3s;
-}
-.add-new-button-container {
-  width: 80%;
-  margin: 20px auto 0;
-  display: flex;
-  justify-content: flex-start;
 }
 
 /* Modal Styles */
@@ -445,13 +434,11 @@ section.head, section.form {
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
+  opacity: 1;
   transition: opacity 0.2s;
 }
 
-.grocery-item:hover button {
-  opacity: 1;
-}
+
 
 .grocery-item button:hover {
   background: #e74c3c;
@@ -837,17 +824,16 @@ section.head, section.form {
   transition: all 0.3s;
 }
 
+.filter-btn.active {
+  background: var(--accent) !important;
+  color: white !important;
+  box-shadow: 0 4px 8px rgb(52, 152, 219);
+}
+
 .filter-btn:hover {
   background: var(--accent);
   color: white;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
-}
-
-.filter-btn.active {
-  background: var(--accent);
-  color: white;
-  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+  box-shadow: 0 4px 8px rgb(52, 152, 219);
 }
 
 /* Share Recipe Button */
@@ -975,3 +961,57 @@ section.head, section.form {
   font-weight: 600;
 }
 
+.shared-list {
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.shared-list h4 {
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.shared-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.shared-user-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  border: 1px solid #ddd;
+}
+
+.shared-user-item span {
+  flex: 1;
+  color: var(--text-dark);
+}
+
+.shared-list .btn-unshare-recipe-small {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s;
+  margin-left: 10px;
+}
+
+.shared-list .btn-unshare-recipe-small:hover {
+  background: #c0392b;
+}

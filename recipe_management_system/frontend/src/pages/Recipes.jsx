@@ -10,7 +10,7 @@ function Recipes() {
   const { recipes, isLoading, isError, message } = useSelector((state) => state.recipe);
   const { user } = useSelector((state) => state.auth);
   const [filter, setFilter] = useState('all');
-  const [shareModal, setShareModal] = useState({ isOpen: false, recipeId: null, recipeTitle: '' });
+  const [shareModal, setShareModal] = useState({ isOpen: false, recipeId: null, recipeTitle: '', sharedWith: [] });
   const [editingRecipe, setEditingRecipe] = useState(null);
 
   const handleUpdate = (recipeId, updatedData) => {
@@ -31,12 +31,19 @@ function Recipes() {
     dispatch(addRecipeToGroceryList(recipeId));
   };
 
-  const handleShare = (recipeId, recipeTitle) => {
-    setShareModal({ isOpen: true, recipeId, recipeTitle });
+  const handleShare = (recipeId, recipeTitle, sharedWith = []) => {
+    setShareModal({ isOpen: true, recipeId, recipeTitle, sharedWith });
   };
 
-  const handleUnShare = (recipeId) => {
-    dispatch(unShareRecipe({ recipeId }));
+  const handleUnShare = async (recipeId) => {
+    if (window.confirm('Are you sure you want to stop viewing this shared recipe?')) {
+      try {
+        await dispatch(unShareRecipe({ recipeId })).unwrap();
+        dispatch(fetchAllRecipes(filter));
+      } catch (error) {
+        alert(error || 'Failed to remove shared recipe');
+      }
+    }
   };
 
   const handleFilterChange = (newFilter) => {
@@ -85,8 +92,11 @@ function Recipes() {
   
   return (
     <div className="recipes-container">
-        <h2>Recipes Page</h2>
-        <p>List of all recipes will be displayed here.</p>
+      <h2>
+        {filter === 'all' && `All Recipes (${recipes.length})`}
+        {filter === 'mine' && `My Recipes (${recipes.length})`}
+        {filter === 'shared' && `Shared With Me (${recipes.length})`}
+      </h2>
         
         <div className="filter-buttons">
           <button 
@@ -108,7 +118,7 @@ function Recipes() {
             Shared with Me
           </button>
           <button 
-            className='add-new-button' 
+            className='filter-btn' 
             onClick={handleAddNew}
           >
             Add New Recipe
@@ -130,12 +140,15 @@ function Recipes() {
           onSave={handleSave}
         />
 
-        <ShareRecipeModal 
-          isOpen={shareModal.isOpen}
-          onClose={() => setShareModal({ isOpen: false, recipeId: null, recipeTitle: '' })}
-          recipeId={shareModal.recipeId}
-          recipeTitle={shareModal.recipeTitle}
-        />
+        {shareModal.isOpen && (
+          <ShareRecipeModal
+            isOpen={shareModal.isOpen}
+            onClose={() => setShareModal({ isOpen: false, recipeId: null, recipeTitle: '', sharedWith: [] })}
+            recipeId={shareModal.recipeId}
+            recipeTitle={shareModal.recipeTitle}
+            sharedWith={shareModal.sharedWith}
+          />
+        )}
     </div>
   )
 }
