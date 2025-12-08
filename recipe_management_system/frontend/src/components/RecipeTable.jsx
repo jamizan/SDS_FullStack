@@ -8,6 +8,18 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
     setExpandedId(expandedId === recipeId ? null : recipeId);
   };
 
+  const isSharedWithMe = (recipe) => {
+    if (!currentUserId){
+      return false;
+    }  
+    const ownerId = (recipe.owner?._id || recipe.owner || recipe.user?._id || recipe.user)?.toString();
+    const userId = currentUserId.toString();
+    const isOwner = ownerId === userId;
+    const isInSharedWith = recipe.sharedWith?.some(id => id.toString() === userId);
+    
+    return isInSharedWith && !isOwner;
+  };
+
   return (
     <>
     <table className="recipe-table">
@@ -26,20 +38,32 @@ function RecipeTable({ recipes, showActions = true, columns = ['title', 'descrip
               id={recipe._id}
               onClick={() => toggleRow(recipe._id)}
               style={{ cursor: 'pointer' }}
-              className={expandedId === recipe._id ? 'expanded' : ''}
+              className={`
+                ${expandedId === recipe._id ? 'expanded' : ''}
+                ${isSharedWithMe(recipe) ? 'shared-recipe' : ''}
+              `}
             >
-              {columns.includes('title') && <td>{recipe.title}</td>}
+              {columns.includes('title') && (
+                <td>
+                  {recipe.title}
+                  {isSharedWithMe(recipe) && <span className="shared-badge">Shared by {recipe.owner?.name || recipe.user?.name}</span>}
+                </td>
+              )}
               {columns.includes('description') && <td>{recipe.description}</td>}
               {columns.includes('time') && <td>{recipe.prepTime} mins</td>}
               {showActions && (
                 <td onClick={(e) => e.stopPropagation()}>
                     <button onClick={() => onEdit(recipe)}>Edit</button>
                     <button onClick={() => onAddToGroceryList(recipe._id)}>Add to List</button>
-                    {(recipe.owner === currentUserId || (!recipe.owner && recipe.user === currentUserId)) && (
+                    {((recipe.owner?._id || recipe.owner) === currentUserId || (!recipe.owner && (recipe.user?._id || recipe.user) === currentUserId)) && (
                       <button className="share-button" onClick={() => onShare(recipe._id, recipe.title)}>Share</button>
                     )}
-                    <button className="unshare-button" onClick={() => onUnShare(recipe._id)}>Unshare</button>
-                    <button id="delete-button" onClick={() => onDelete(recipe._id)}>Delete</button>
+                    {isSharedWithMe(recipe) && (
+                      <button className="unshare-button" onClick={() => onUnShare(recipe._id)}>Remove Shared Recipe</button>
+                    )}
+                    {((recipe.owner?._id || recipe.owner) === currentUserId || (!recipe.owner && (recipe.user?._id || recipe.user) === currentUserId)) && (
+                      <button id="delete-button" onClick={() => onDelete(recipe._id)}>Delete</button>
+                    )}
                 </td>
               )}
             </tr>

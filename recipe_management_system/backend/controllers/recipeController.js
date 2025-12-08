@@ -17,7 +17,9 @@ const getRecipes = asyncHandler(async (req, res) => {
                 { owner: req.user.id },
                 { user: req.user.id, owner: { $exists: false } }
             ]
-        });
+        })
+        .populate('owner', 'name email')
+        .populate('user', 'name email');
     } else if (filter === 'shared') {
         // Only recipes shared with the user (not owned by them)
         recipes = await Recipe.find({ 
@@ -26,7 +28,9 @@ const getRecipes = asyncHandler(async (req, res) => {
                 { owner: { $ne: req.user.id } },
                 { user: { $ne: req.user.id }, owner: { $exists: false } }
             ]
-        });
+        })
+        .populate('owner', 'name email')
+        .populate('user', 'name email');
     } else {
         // All recipes: owned by user OR shared with user (with backward compatibility)
         recipes = await Recipe.find({
@@ -35,7 +39,9 @@ const getRecipes = asyncHandler(async (req, res) => {
                 { user: req.user.id, owner: { $exists: false } },
                 { sharedWith: req.user.id }
             ]
-        });
+        })
+        .populate('owner', 'name email')
+        .populate('user', 'name email');
     }
 
     res.status(200).json(recipes);

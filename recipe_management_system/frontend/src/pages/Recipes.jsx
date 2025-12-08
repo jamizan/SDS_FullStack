@@ -124,7 +124,7 @@ function Recipes() {
           onShare={handleShare}
           onUnShare={handleUnShare}
           onEdit={handleEdit}
-          currentUserId={user?.id}
+          currentUserId={user?._id}
           editingRecipe={editingRecipe}
           onCloseModal={handleCloseModal}
           onSave={handleSave}
