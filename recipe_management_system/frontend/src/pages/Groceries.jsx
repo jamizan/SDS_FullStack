@@ -200,7 +200,9 @@ function Groceries() {
             {groceryList.recipes.map((recipe) => (
               <div key={recipe._id} className="recipe-chip">
                 <span>{recipe.title}</span>
-                <button onClick={() => handleRemoveRecipe(recipe._id)}>&times;</button>
+                {groceryList && user && (groceryList.user._id || groceryList.user) === user._id && (
+                  <button onClick={() => handleRemoveRecipe(recipe._id)}>&times;</button>
+                )}
               </div>
             ))}
           </div>
